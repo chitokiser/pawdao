@@ -1,136 +1,86 @@
-<!DOCTYPE html>
+<!-- /mypage.html -->
+<!doctype html>
 <html lang="ko">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.88.1">
-    <link rel="shortcut icon" href="../images/logo.png" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-        crossorigin="anonymous">
-    <link rel="stylesheet" href="/css/main.css">
-    <!-- Font for the SVG -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Protest+Guerrilla&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PAW DAO - 마이페이지</title>
 
-    <title>ZEM DAO</title>
+  <link rel="stylesheet" href="assets/css/app.css" />
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.14.0/dist/ethers.umd.min.js"></script>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/partials.js"></script>
+  <script src="assets/js/wallet.js"></script>
+  <script defer src="assets/js/pages/mypage.js"></script>
 </head>
 <body>
-  
-    <!-- Placeholder for dynamic header -->
-    <div id="menu-placeholder"></div>
+  <div class="page">
+    <div id="site-header"></div>
 
-    <script>
-      // Load header dynamically from dashboard.html
-      fetch('dashboard.html')
-          .then(response => response.text())
-          .then(data => {
-              document.getElementById('menu-placeholder').innerHTML = data;
-              
-              // After injecting content, dynamically load the topinfo.js script
-              const script = document.createElement('script');
-              script.src = '../src/topinfo.js';
-              script.type = 'text/javascript';
-              document.body.appendChild(script);  // Append the script to the body
-          })
-          .catch(error => console.error('Error loading the dashboard content:', error));
-  </script>
-    
-  <!-- My Page Section -->
+    <main class="main-wrap">
+      <h1 class="page-title">마이페이지</h1>
 
+      <section class="card">
+        <div class="card-h">내 상태</div>
+        <div class="grid">
+          <div class="kv"><div class="k">지갑</div><div class="v" id="wAddr">-</div></div>
+          <div class="kv"><div class="k">HEX 잔액</div><div class="v" id="hexBal">-</div></div>
 
-    <div class="card-header text-center">
-      <h5>My Page</h5>
-    </div>
-    <div class="card-body text-center">
+          <div class="kv"><div class="k">deposited</div><div class="v" id="uDeposited">-</div></div>
+          <div class="kv"><div class="k">totalPaid</div><div class="v" id="uTotalPaid">-</div></div>
+          <div class="kv"><div class="k">1회배당금액</div><div class="v" id="uPower">-</div></div>
+          <div class="kv"><div class="k">champion</div><div class="v" id="uChampion">-</div></div>
 
-      <ul class="list-group mb-3">
-        <li class="list-group-item">
-          Click <strong>[Connection Wallet > sign up]</strong> in the upper right menu,<br>
-          enter the referrer's address, and sign up to become level 1.
-        </li>
-      </ul>
+          <div class="kv"><div class="k">pending</div><div class="v" id="uPending">-</div></div>
+          <div class="kv"><div class="k">pendingAt</div><div class="v" id="uPendingAt">-</div></div>
+          <div class="kv"><div class="k">timeout</div><div class="v" id="uTimeout">-</div></div>
 
-      <div class="mb-3">
-        <button class="btn btn-outline-success w-100" onclick="MemberLogin()">Wallet Connection</button>
-      </div>
+          <div class="kv"><div class="k">numerator</div><div class="v" id="uNum">-</div></div>
+          <div class="kv"><div class="k">denominator</div><div class="v" id="uDen">-</div></div>
+        </div>
+        <div class="note">claim은 24시간마다 가능합니다.</div>
+      </section>
 
-      <ul class="list-group mb-3 text-start">
-        <li class="list-group-item">MyZem: <span id="MyZem">-</span>ZEM</li>
-        <li class="list-group-item">MyZum: <span id="MyZum">-</span>ZUM</li>
-        <li class="list-group-item">Level: <span id="Mylev">-</span></li>
-        <li class="list-group-item">Experience: <span id="Exp">-</span> exp</li>
-        <li class="list-group-item">Experience needed to level up: <span id="Expneeded">-</span> exp</li>
-        <li class="list-group-item">Points: <span id="Mypoint">-</span> p</li>
-        <li class="list-group-item">Mentor: <span id="Mymento">-</span></li>
+      <section class="card">
+        <div class="card-h">기부(Donation)</div>
+        <div class="row">
+          <input class="input" id="inDeposit" placeholder="예: 1.0 (HEX)" />
+          <button class="btn" id="btnDeposit">Donation</button>
+        </div>
+        <div class="note">첫 기부는 1 HEX 이상</div>
+      </section>
 
-        <li class="list-group-item">
-          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
-            <button class="btn btn-outline-dark position-relative mb-2 mb-md-0" onclick="Levelup()">
-              Level Up
-              <span class="badge bg-dark position-absolute top-0 start-100 translate-middle" id="Mylev2">-</span>
-            </button>
-            <div class="progress w-100 ms-md-3">
-              <div class="progress-bar progress-bar-striped bg-success" id="LevelBar" role="progressbar"
-                aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
-              </div>
-            </div>
-          </div>
-        </li>
-      </ul>
+      <section class="card">
+        <div class="card-h">배당 청구(Claim)</div>
+        <div class="row">
+          <button class="btn" id="btnClaim">claim</button>
+          <div class="pill" id="claimHint">-</div>
+        </div>
+        <div class="note">세전 배당의 10%는 taxPool로 적립됩니다.</div>
+      </section>
 
-      <p class="text-danger fw-bold mb-3">1 Point = 1 ZEM</p>
-
-      <div class="d-flex flex-column flex-md-row justify-content-between">
-        <button class="btn btn-outline-success w-100 mb-2 me-md-2" onclick="Bonuswithdraw()">Withdraw points (ZEM deposited)</button>
-        <button class="btn btn-outline-primary w-100 ms-md-2" id="fetchAddresses" onclick="fetchMentees()">The member who recommended me</button>
-      </div>
-
-      <ul id="addressList" class="list-group mt-3 text-start"></ul>
-
-      <div class="mt-4">
-        <button class="btn btn-outline-warning w-100" onclick="Buff()">Become Level 2 (Holder of 500 ZUM or more)</button>
-      </div>
-
-    </div>
-  </div>
-
-
-  
-
-         
-
- <!--Start footer -->
-  
- <div id="footer"></div>
-
- <script>
-   // Load header dynamically from dashboard.html
-   fetch('../footer.html')
-       .then(response => response.text())
-       .then(data => {
-           document.getElementById('footer').innerHTML = data;
-           
-           // After injecting content, dynamically load the topinfo.js script
-           const script = document.createElement('script');
-      
-           document.body.appendChild(script);  // Append the script to the body
-       })
-       .catch(error => console.error('Error loading the dashboard content:', error));
-</script>
-<!-- End footer -->
-                   
+      <section class="card">
+        <div class="card-h">계약 상태</div>
+        <div class="grid">
+          <div class="kv"><div class="k">계약 HEX 잔액</div><div class="v" id="contractHex">-</div></div>
+          <div class="kv"><div class="k">taxPool</div><div class="v" id="taxPool">-</div></div>
+          <div class="kv"><div class="k">taxThreshold</div><div class="v" id="taxThreshold">-</div></div>
+        </div>
+      </section>
     </main>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.2.0/ethers.umd.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
 
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-          <script src="..\src\mypage.js"></script>
-  </body>
-  </body>
+    <div id="site-footer"></div>
+  </div>
+  <!-- scripts: 여기만 -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.14.0/dist/ethers.umd.min.js"></script>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/wallet.js"></script>
+<script src="assets/js/partials.js"></script>
+
+<!-- header.js는 partial 주입이 끝난 다음에 1번만 -->
+<script src="assets/js/header.js"></script>
+  <script defer src="assets/js/pages/mypage.js"></script>
+</body>
 </html>

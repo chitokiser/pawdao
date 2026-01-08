@@ -1,0 +1,49 @@
+<!-- /partials/head.html -->
+<header class="top-header" id="siteHeaderRoot">
+  <div class="hdr-inner">
+    <!-- 로고 -->
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="assets/images/pawdao.png" alt="PAW DAO" />
+      <span class="brand-name">PAW DAO</span>
+    </a>
+
+    <!-- 데스크탑 메뉴 (평소에는 보임) -->
+    <nav class="nav desktop-nav" aria-label="primary">
+      <a href="mypage.html">마이페이지</a>
+      <a href="offchain.html">게임</a>
+    </nav>
+
+    <!-- 우측: 네트워크 + 지갑 -->
+    <div class="hdr-right">
+      <span class="net-badge" id="netBadge">-</span>
+      <button class="btn" id="btnConnect" type="button">지갑연결</button>
+
+      <!-- 모바일 햄버거 (작아지면 보임) -->
+      <button class="burger" id="btnBurger" type="button" aria-label="menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 모바일 드로어 -->
+  <div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
+  <aside class="nav-drawer" id="navDrawer" aria-label="mobile menu">
+    <div class="nav-top">
+      <div class="nav-title">MENU</div>
+      <button class="nav-close" id="navClose" type="button" aria-label="close">×</button>
+    </div>
+
+    <nav class="nav-links">
+      <a href="mypage.html">마이페이지</a>
+      <a href="onchain.html">온체인게임</a>
+      <a href="offchain.html">오프체인게임</a>
+    </nav>
+  </aside>
+
+  <!-- 지갑 연결 후 표시되는 토큰바 -->
+  <div class="hdr-tokenbar" id="hdrTokenWrap" style="display:none;">
+    <div class="tokenbar-inner" id="hdrTokenBar"></div>
+  </div>
+</header>
+
+<script src="assets/js/header.js"></script>

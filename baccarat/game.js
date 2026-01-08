@@ -1,14 +1,103 @@
-let balance = 1000;
+// \baccarat\game.js (전체 교체)
+let balance = 0; // 시작 전 0, START 누르면 100
+let started = false;
+let dealing = false;
+
 let bets = { player: 0, banker: 0, tie: 0, ppair: 0, bpair: 0 };
 let deck = [];
 
 const balanceEl = document.getElementById('balance');
 const resultEl = document.getElementById('result');
+
 const soundBet = document.getElementById('sound-bet');
 const soundWin = document.getElementById('sound-win');
 const soundLose = document.getElementById('sound-lose');
 const soundWind = document.getElementById('sound-wind');
 const soundClick = document.getElementById('sound-click');
+
+const btnStart = document.getElementById('start');
+const btnDeal = document.getElementById('deal');
+const btnReset = document.getElementById('reset');
+const btnEnd = document.getElementById('end');
+
+const shoeSlotEl = document.getElementById('shoeSlot');
+const fxLayer = document.getElementById('fxLayer');
+const scaleWrap = document.getElementById('scaleWrap');
+const stage = document.getElementById('stage');
+
+const playerHandEl = document.getElementById('player-hand');
+const bankerHandEl = document.getElementById('banker-hand');
+
+function getReturnUrl(){
+  const u = new URL(location.href);
+  return u.searchParams.get("return") || "../../mypage.html";
+}
+
+/* 스테이지를 화면에 맞춰 전체 축소(scale) */
+function fitStageToViewport(){
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  const pad = 12; // viewport padding (css와 맞추기)
+  const targetW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stage-w')) || 390;
+  const targetH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stage-h')) || 720;
+
+  const maxW = vw - pad * 2;
+  const maxH = vh - pad * 2;
+
+  const s = Math.min(maxW / targetW, maxH / targetH, 1);
+  scaleWrap.style.transform = `scale(${s})`;
+}
+window.addEventListener('resize', fitStageToViewport);
+window.addEventListener('orientationchange', ()=>setTimeout(fitStageToViewport, 50));
+
+function setUIEnabled(){
+  document.querySelectorAll('.bet, .chip').forEach(el=>{
+    el.style.pointerEvents = started ? 'auto' : 'none';
+    el.style.opacity = started ? '1' : '.35';
+  });
+  btnDeal.disabled = !started;
+  btnReset.disabled = !started;
+  btnEnd.disabled = !started;
+}
+
+function lockBetDuringDeal(lock){
+  dealing = lock;
+  document.querySelectorAll('.bet, .chip').forEach(el=>{
+    el.style.pointerEvents = (started && !dealing) ? 'auto' : 'none';
+    el.style.opacity = (started && !dealing) ? '1' : '.70';
+  });
+  btnDeal.disabled = (!started || dealing);
+  btnReset.disabled = (!started || dealing);
+  btnEnd.disabled = (!started || dealing);
+}
+
+function resetRoundUI(){
+  bets = { player: 0, banker: 0, tie: 0, ppair: 0, bpair: 0 };
+  document.querySelectorAll('.chip-stack').forEach(stack=>stack.innerHTML = '');
+  document.querySelectorAll('.bet').forEach(b=>b.classList.remove('active'));
+
+  buildHandSlots(playerHandEl);
+  buildHandSlots(bankerHandEl);
+
+  resultEl.textContent = '';
+}
+
+/* hand 슬롯 3개를 항상 유지 */
+function buildHandSlots(handEl){
+  handEl.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const slot = document.createElement('div');
+    slot.className = 'card-slot';
+    slot.dataset.slotIndex = String(i);
+    handEl.appendChild(slot);
+  }
+}
+
+function getHandSlot(handEl, index){
+  const slots = handEl.querySelectorAll('.card-slot');
+  return slots[index] || null;
+}
 
 /* 덱 초기화 */
 function initDeck() {
@@ -39,24 +128,23 @@ function getCardValue(card) {
   if(card.value === 'A') return 1;
   return parseInt(card.value);
 }
-
 function calcTotal(hand){
   return hand.reduce((sum, card) => (sum + getCardValue(card)) % 10, 0);
 }
 
 /* 잔액 애니메이션 */
 function animateBalance(newValue){
-  const current = parseInt(balanceEl.textContent);
+  const current = parseInt(balanceEl.textContent || "0");
   const diff = newValue - current;
   const step = diff / 20;
   let i = 0;
   function update(){
     if(i < 20){
-      balanceEl.textContent = Math.round(current + step * i);
+      balanceEl.textContent = String(Math.round(current + step * i));
       i++;
       requestAnimationFrame(update);
     } else {
-      balanceEl.textContent = newValue;
+      balanceEl.textContent = String(newValue);
     }
   }
   update();
@@ -87,8 +175,8 @@ function mapCard(card){
   return `${valueMap[card.value]}_of_${suitMap[card.suit]}.png`;
 }
 
-/* 플립 카드 생성 (앞/뒤) */
-function createFlippableCard(card) {
+/* 플립 카드 생성 (flipDelay로 컨트롤) */
+function createFlippableCard(card, flipDelayMs = 180) {
   const container = document.createElement('div');
   container.className = 'card-container';
 
@@ -98,19 +186,22 @@ function createFlippableCard(card) {
   const front = document.createElement('img');
   front.className = 'card-front';
   front.src = `https://raw.githubusercontent.com/hayeah/playing-cards-assets/master/png/${mapCard(card)}`;
-  front.style.background = '#fff'; // 흰색 배경
+  front.style.background = '#fff';
 
   const back = document.createElement('div');
   back.className = 'card-back';
-  back.style.background = '#fff'; // 뒷면도 흰색 배경
+  back.style.background = '#fff';
 
   inner.appendChild(front);
   inner.appendChild(back);
   container.appendChild(inner);
 
-  setTimeout(()=> inner.classList.add('flip'), 300); // 0.3초 후 뒤집기
-
+  setTimeout(()=> inner.classList.add('flip'), flipDelayMs);
   return container;
+}
+
+function wait(ms){
+  return new Promise(res=>setTimeout(res, ms));
 }
 
 /* 바카라 3장 룰 */
@@ -137,12 +228,12 @@ function baccaratDrawRule(player, banker){
   return { player, banker };
 }
 
-/* 승패 라벨 애니메이션 */
+/* 승패 라벨 */
 function showWinLabel(text) {
   const label = document.createElement('div');
   label.className = 'win-label';
   label.textContent = text;
-  document.querySelector('.baccarat-container').appendChild(label);
+  stage.appendChild(label);
   setTimeout(() => label.remove(), 1500);
 }
 
@@ -156,14 +247,11 @@ function checkResult(playerHand, bankerHand){
   else if(bankerTotal > playerTotal) result = 'BANKER WIN!';
   else result = 'TIE!';
 
-  // 승패 라벨 표시
   showWinLabel(result);
 
-  // 페어 여부
   const playerPair = (playerHand.length >= 2 && getCardValue(playerHand[0]) === getCardValue(playerHand[1]));
   const bankerPair = (bankerHand.length >= 2 && getCardValue(bankerHand[0]) === getCardValue(bankerHand[1]));
 
-  // 배당
   if(result.includes('PLAYER')) balance += bets.player * 2;
   if(result.includes('BANKER')) balance += bets.banker * 1.95;
   if(result.includes('TIE')) balance += bets.tie * 8;
@@ -173,49 +261,142 @@ function checkResult(playerHand, bankerHand){
   animateBalance(Math.floor(balance));
   resultEl.textContent = result + (playerPair ? ' + P 페어!' : '') + (bankerPair ? ' + B 페어!' : '');
 
-  if(result.includes('WIN') || result.includes('TIE')) soundWin.play();
-  else soundLose.play();
+  const won =
+    (result.includes('PLAYER') && bets.player > 0) ||
+    (result.includes('BANKER') && bets.banker > 0) ||
+    (result.includes('TIE') && bets.tie > 0) ||
+    (playerPair && bets.ppair > 0) ||
+    (bankerPair && bets.bpair > 0);
 
-  // 초기화
+  if(won) soundWin.play().catch(()=>{});
+  else soundLose.play().catch(()=>{});
+
   bets = { player: 0, banker: 0, tie: 0, ppair: 0, bpair: 0 };
   document.querySelectorAll('.chip-stack').forEach(stack=>stack.innerHTML = '');
+  document.querySelectorAll('.bet').forEach(b=>b.classList.remove('active'));
+
+  lockBetDuringDeal(false);
 }
 
-/* Deal 버튼 */
-document.getElementById('deal').addEventListener('click', ()=>{
+/* 슈박스 → 슬롯으로 카드 날리기 */
+async function flyFromShoeToSlot(slotEl, cardObj){
+  const start = shoeSlotEl.getBoundingClientRect();
+  const end = slotEl.getBoundingClientRect();
+
+  const sX = start.left + start.width * 0.5;
+  const sY = start.top + start.height * 0.5;
+
+  const eX = end.left + end.width * 0.5;
+  const eY = end.top + end.height * 0.5;
+
+  const fly = document.createElement('div');
+  fly.className = 'fly-card';
+
+  // 시작 위치(중심 기준으로 카드 크기 반영)
+  fly.style.left = `${sX - end.width * 0.5}px`;
+  fly.style.top  = `${sY - end.height * 0.5}px`;
+
+  // 크기를 목표 슬롯 크기로 맞춤(모든 scale 상태에서도 잘 맞게)
+  fly.style.width  = `${end.width}px`;
+  fly.style.height = `${end.height}px`;
+
+  fxLayer.appendChild(fly);
+
+  // 첫 프레임 이후 이동
+  await wait(16);
+
+  const dx = (eX - sX);
+  const dy = (eY - sY);
+
+  fly.style.transform = `translate3d(${dx}px, ${dy}px, 0) rotate(${(Math.random()*10-5).toFixed(2)}deg)`;
+  fly.style.opacity = '1';
+
+  // 이동 완료 대기
+  await new Promise(res=>{
+    fly.addEventListener('transitionend', ()=>res(), { once:true });
+  });
+
+  fly.remove();
+
+  // 도착 후 슬롯에 플립 카드 삽입
+  slotEl.innerHTML = '';
+  slotEl.appendChild(createFlippableCard(cardObj, 160));
+}
+
+/* START */
+btnStart.addEventListener('click', ()=>{
+  if(started) return;
+  started = true;
+  balance = 100;
+  animateBalance(balance);
+  resultEl.textContent = '게임 시작! 베팅 후 DEAL을 누르세요.';
+  resetRoundUI();
+  initDeck();
+  setUIEnabled();
+});
+
+/* Deal: 딜러 느낌(번갈아 빠르게) + 슈박스에서 날아옴 */
+btnDeal.addEventListener('click', async ()=>{
+  if(!started){
+    alert("START를 먼저 누르세요!");
+    return;
+  }
+  if(dealing) return;
+
   if(Object.values(bets).every(v=>v===0)){
     alert("베팅 후 진행하세요!");
     return;
   }
 
+  lockBetDuringDeal(true);
+  resultEl.textContent = 'DEALING...';
+
+  soundWind.currentTime = 0;
+  soundWind.play().catch(()=>{});
+
+  // 슬롯 재구성
+  buildHandSlots(playerHandEl);
+  buildHandSlots(bankerHandEl);
+
   const playerHand = [deck.pop(), deck.pop()];
   const bankerHand = [deck.pop(), deck.pop()];
 
-  document.getElementById('player-hand').innerHTML = '';
-  document.getElementById('banker-hand').innerHTML = '';
+  // 1장씩 번갈아(체감상 동시에)
+  await flyFromShoeToSlot(getHandSlot(playerHandEl, 0), playerHand[0]);
+  await wait(90);
+  await flyFromShoeToSlot(getHandSlot(bankerHandEl, 0), bankerHand[0]);
+  await wait(90);
 
-  document.getElementById('player-hand').appendChild(createFlippableCard(playerHand[0]));
-  document.getElementById('banker-hand').appendChild(createFlippableCard(bankerHand[0]));
-  document.getElementById('player-hand').appendChild(createFlippableCard(playerHand[1]));
-  document.getElementById('banker-hand').appendChild(createFlippableCard(bankerHand[1]));
+  await flyFromShoeToSlot(getHandSlot(playerHandEl, 1), playerHand[1]);
+  await wait(90);
+  await flyFromShoeToSlot(getHandSlot(bankerHandEl, 1), bankerHand[1]);
+  await wait(160);
 
-  setTimeout(()=>{
-    const { player, banker } = baccaratDrawRule(playerHand, bankerHand);
+  // 3장 룰 적용 후 추가 카드도 같은 방식
+  const { player, banker } = baccaratDrawRule(playerHand, bankerHand);
 
-    if(player.length === 3){
-      document.getElementById('player-hand').appendChild(createFlippableCard(player[2]));
-    }
-    if(banker.length === 3){
-      document.getElementById('banker-hand').appendChild(createFlippableCard(banker[2]));
-    }
+  if(player.length === 3){
+    await wait(140);
+    await flyFromShoeToSlot(getHandSlot(playerHandEl, 2), player[2]);
+  }
+  if(banker.length === 3){
+    await wait(140);
+    await flyFromShoeToSlot(getHandSlot(bankerHandEl, 2), banker[2]);
+  }
 
-    setTimeout(()=>checkResult(player, banker), 2000);
-  }, 1500);
+  await wait(650);
+  checkResult(player, banker);
 });
 
 /* 칩 클릭 */
 document.querySelectorAll('.chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{
+    if(!started){
+      alert("START를 먼저 누르세요!");
+      return;
+    }
+    if(dealing) return;
+
     const activeBet = document.querySelector('.bet.active');
     if(!activeBet){
       alert("배팅 영역을 먼저 선택하세요!");
@@ -229,9 +410,10 @@ document.querySelectorAll('.chip').forEach(chip=>{
       bets[betKey] += value;
       animateBalance(balance);
       addChipToStack(activeBet, value);
-      soundBet.play();
+      soundBet.currentTime = 0;
+      soundBet.play().catch(()=>{});
     } else {
-      alert("잔액이 부족합니다!");
+      alert("점수가 부족합니다!");
     }
   });
 });
@@ -239,24 +421,51 @@ document.querySelectorAll('.chip').forEach(chip=>{
 /* 배팅 영역 클릭 */
 document.querySelectorAll('.bet').forEach(area=>{
   area.addEventListener('click', ()=>{
+    if(!started){
+      alert("START를 먼저 누르세요!");
+      return;
+    }
+    if(dealing) return;
+
     soundClick.currentTime = 0;
-    soundClick.play();
+    soundClick.play().catch(()=>{});
+
     document.querySelectorAll('.bet').forEach(b=>b.classList.remove('active'));
     area.classList.add('active');
   });
 });
 
-/* 리셋 */
-document.getElementById('reset').addEventListener('click', ()=>{
-  balance = 1000;
-  bets = { player: 0, banker: 0, tie: 0, ppair: 0, bpair: 0 };
+/* RESET */
+btnReset.addEventListener('click', ()=>{
+  if(!started){
+    alert("START를 먼저 누르세요!");
+    return;
+  }
+  if(dealing) return;
+
+  balance = 100;
   animateBalance(balance);
-  resultEl.textContent = '';
-  document.getElementById('player-hand').innerHTML = '';
-  document.getElementById('banker-hand').innerHTML = '';
-  document.querySelectorAll('.chip-stack').forEach(stack=>stack.innerHTML = '');
+  resetRoundUI();
   initDeck();
+  resultEl.textContent = '리셋 완료. 베팅 후 DEAL을 누르세요.';
 });
 
-/* 초기화 */
+/* END */
+btnEnd.addEventListener('click', ()=>{
+  if(!started){
+    alert("START를 먼저 누르세요!");
+    return;
+  }
+  if(dealing) return;
+
+  localStorage.setItem("paw_score_baccarat", String(Math.floor(balance)));
+  location.href = getReturnUrl();
+});
+
+/* 초기 */
+buildHandSlots(playerHandEl);
+buildHandSlots(bankerHandEl);
+setUIEnabled();
 initDeck();
+animateBalance(balance);
+fitStageToViewport();
