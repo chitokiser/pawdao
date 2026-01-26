@@ -1,0 +1,85 @@
+<!-- /intro.html -->
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PAW DAO 소개/공시</title>
+
+  <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body>
+  <div class="page">
+    <div id="site-header"></div>
+
+    <main class="main-wrap">
+      <section class="hero">
+        <h1>PAW DAO 소개 및 공시</h1>
+        <p class="desc">
+          아래 내용은 PAW DAO의 기부·배당·게임 연동 규칙과 비도박성(사행성 아님) 안내를 포함합니다.
+        </p>
+        <div class="hero-actions">
+          <a class="btn" href="mypage.html">기부하기</a>
+          <a class="btn ghost" href="index.html">홈으로</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-h">1) 핵심 규칙 요약</div>
+        <div class="note" style="margin-top:10px;">
+          • 기부자는 24시간마다 HEX를 인출(배당 청구)할 수 있습니다.<br>
+          • 1HEX 이상 토큰을 스마트컨트랙트에 기부하면 배당이 시작됩니다.<br>
+          • 1회 배당금액 = 기부금액 × 분자(기본값 10000) / 분모(기본값 10000×10000)<br>
+          • 게임에서 획득한 점수는 분자에 계속 합산되어 배당 파워(배당 기준치)가 증가합니다.<br>
+          • 추가로 기보를 하면 배당파워가 초기화 됩니다<br>
+          • 기부금액 대비 누적 인출이 10배 이상이면 추가 배당 대상에서 제외되며 챔피언에 등극됩니다.<br>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:14px;">
+        <div class="card-h">2) 기부금 비소멸(중요 공시)</div>
+        <div class="note" style="margin-top:10px;">
+          • 본 플랫폼에서 기부자가 스마트컨트랙트에 전송한 기부금은 소멸되지 않습니다.<br>
+          • 기부금은 배당 산정의 기준값으로 기록·유지되며, 승패에 따라 사라지거나 몰수되는 구조가 아닙니다.<br>
+          • 기부금이 “패자에게서 승자에게 이전되는 판돈”처럼 작동하지 않도록 설계되었습니다.
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:14px;">
+        <div class="card-h">3) 비도박성(사행성 아님) 공시</div>
+        <div class="note" style="margin-top:10px;">
+          본 DAO는 사행성(도박) 게임이 아니며, 다음 이유로 전형적인 베팅/판돈 구조와 구분됩니다.<br><br>
+
+          1. 원금/수익 보장 부재<br>
+          기부는 환급 또는 수익을 약속하지 않습니다. 배당은 확정 이익이 아니라 알고리즘에 따른 분배 결과입니다.<br><br>
+
+          2. 판돈 몰수/승자독식 구조 부재<br>
+          기부금은 소멸·몰수되지 않으며, 특정 승자에게 패자의 기부금이 이전되는 구조가 아닙니다.<br><br>
+
+          3. 즉시 베팅·즉시 환급 구조 부재<br>
+          배당 인출은 24시간 단위로 제한되어 단기 베팅/즉시 회수 패턴과 다릅니다.<br><br>
+
+          4. 운영자 임의 개입 최소화(자동화 전제)<br>
+          핵심 규칙은 스마트컨트랙트 로직으로 실행되며, 운영자가 임의로 결과를 변경하거나 배당을 조정하는 것을 전제로 하지 않습니다.<br><br>
+
+          5. 과도한 기대수익 방지 안전장치(챔피언 규칙)<br>
+          기부 대비 10배 이상 인출 시 추가 배당이 종료되어 무한 수익 구조를 차단합니다.
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:14px;">
+        <div class="card-h">4) 참고(면책/주의)</div>
+        <div class="note" style="margin-top:10px;">
+          • 토큰 및 온체인 시스템은 가격 변동, 기술적 리스크, 네트워크 장애 등의 위험이 있을 수 있습니다.<br>
+          • 본 안내는 일반적 설명이며, 국가/지역별 규제 해석에 따라 추가 문구 또는 절차가 필요할 수 있습니다.
+        </div>
+      </section>
+    </main>
+
+    <div id="site-footer"></div>
+  </div>
+
+  <script src="assets/js/partials.js"></script>
+  <script src="assets/js/header.js"></script>
+</body>
+</html>

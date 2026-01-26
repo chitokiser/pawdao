@@ -1,0 +1,81 @@
+<!-- /mypage.html -->
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PAW DAO - 마이페이지</title>
+
+  <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body>
+  <div class="page">
+    <div id="site-header"></div>
+
+    <main class="main-wrap">
+      <h1 class="page-title">마이페이지</h1>
+
+      <section class="card">
+        <div class="card-h">내 상태</div>
+        <div class="grid">
+          <div class="kv"><div class="k">지갑</div><div class="v" id="wAddr">-</div></div>
+          <div class="kv"><div class="k">네트워크</div><div class="v" id="wNet">-</div></div>
+          <div class="kv"><div class="k">HEX 잔액</div><div class="v" id="hexBal">-</div></div>
+
+          <div class="kv"><div class="k">deposited</div><div class="v" id="uDeposited">-</div></div>
+          <div class="kv"><div class="k">totalPaid</div><div class="v" id="uTotalPaid">-</div></div>
+          <div class="kv"><div class="k">1회배당금액</div><div class="v" id="uPower">-</div></div>
+          <div class="kv"><div class="k">champion</div><div class="v" id="uChampion">-</div></div>
+
+          <div class="kv"><div class="k">pending</div><div class="v" id="uPending">-</div></div>
+          <div class="kv"><div class="k">pendingAt</div><div class="v" id="uPendingAt">-</div></div>
+
+          <div class="kv"><div class="k">numerator</div><div class="v" id="uNum">-</div></div>
+          <div class="kv"><div class="k">denominator</div><div class="v" id="uDen">-</div></div>
+
+          <div class="kv"><div class="k">pendingTimeout</div><div class="v" id="cTimeout">-</div></div>
+        </div>
+
+        <div class="note">지갑 연결 시 자동으로 갱신됩니다.</div>
+      </section>
+
+      <section class="card">
+        <div class="card-h">기부 (Donation)</div>
+        <div class="row">
+          <input class="input" id="depositAmount" placeholder="예: 1.0 (HEX)" />
+          <button class="btn" id="btnDeposit" type="button">Donation</button>
+        </div>
+        <div class="note">첫 기부는 1 HEX 이상</div>
+      </section>
+
+      <section class="card">
+        <div class="card-h">배당 청구</div>
+        <div class="row">
+          <button class="btn" id="btnClaim" type="button">Claim</button>
+          <div class="pill" id="claimHint">-</div>
+        </div>
+        <div class="note">claim은 24시간마다 가능합니다.</div>
+      </section>
+
+      <section class="card">
+        <div class="card-h">계약 상태</div>
+        <div class="grid">
+          <div class="kv"><div class="k">계약 HEX 잔액</div><div class="v" id="cHex">-</div></div>
+          <div class="kv"><div class="k">TaxPool / Threshold</div><div class="v" id="cTax">-</div></div>
+        </div>
+      </section>
+    </main>
+
+    <div id="site-footer"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.14.0/dist/ethers.umd.min.js"></script>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/wallet.js"></script>
+  <script src="assets/js/partials.js"></script>
+
+  <script src="assets/js/header.js"></script>
+  <script defer src="assets/js/pages/mypage.js"></script>
+</body>
+</html>

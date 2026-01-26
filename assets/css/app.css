@@ -1,0 +1,421 @@
+/* /assets/css/app.css */
+:root{
+  --bg:#0b0e14;
+  --card:#101522;
+  --text:#e9eefc;
+  --muted:#9aa7c7;
+  --line:rgba(255,255,255,.08);
+  --line2:rgba(255,255,255,.12);
+  --btn:#1e2a44;
+  --btn2:#182133;
+  --good:#4be38a;
+  --bad:#ff5c5c;
+  --pill:rgba(255,255,255,.06);
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+
+body{
+  margin:0;
+background:
+  radial-gradient(800px 420px at 20% -12%, rgba(88,140,255,.16), transparent 60%),
+  radial-gradient(700px 380px at 80% -14%, rgba(255,170,70,.08), transparent 58%),
+  var(--bg);
+
+
+  color:var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Apple SD Gothic Neo, "Noto Sans KR", sans-serif;
+}
+
+.page{ min-height:100%; display:flex; flex-direction:column; }
+.main-wrap{ width:100%; max-width:1100px; margin:0 auto; padding:22px 18px 50px; flex:1; }
+
+/* =========================
+   Header
+========================= */
+.top-header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  backdrop-filter: blur(10px);
+  background: rgba(10,12,18,.72);
+  border-bottom:1px solid var(--line);
+}
+
+.hdr-inner{
+  max-width:1100px;
+  margin:0 auto;
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:var(--text);
+}
+.brand-logo{
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  display:block;
+  object-fit:cover;
+}
+.brand-name{
+  font-size:15px;
+  letter-spacing:.6px;
+}
+
+.hdr-right{ display:flex; align-items:center; gap:10px; }
+
+.net-badge{
+  font-size:12px;
+  color:var(--muted);
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.02);
+  padding:8px 10px;
+  border-radius:12px;
+}
+
+/* 버튼 */
+.btn{
+  cursor:pointer;
+  border:1px solid var(--line2);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:14px;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  user-select:none;
+}
+.btn:hover{ border-color:rgba(255,255,255,.18); }
+.btn:active{ transform: translateY(1px); }
+.btn.ghost{ background: rgba(255,255,255,.03); }
+/* =========================
+   Desktop nav + Mobile hamburger
+   - Desktop: nav ON, burger OFF
+   - <=900px: nav OFF, burger ON
+========================= */
+
+/* 데스크탑 기본: 메뉴 보이고 햄버거 숨김 */
+.nav{ display:flex; gap:14px; flex-wrap:wrap; }
+.burger{ display:none; }
+
+/* 햄버거 버튼 스타일(표시는 미디어쿼리에서) */
+.burger{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.03);
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  cursor:pointer;
+}
+.burger span{
+  width:18px;
+  height:2px;
+  background: rgba(255,255,255,.75);
+  border-radius:10px;
+}
+.burger:hover{ border-color: rgba(255,255,255,.18); }
+
+/* 모바일/태블릿: 메뉴 숨기고 햄버거 표시 */
+@media (max-width: 900px){
+  .nav{ display:none; }
+  .burger{ display:flex; }
+}
+
+
+/* 혹시 남아있을 수 있는 클래스 안전 처리 */
+.desktop-only{ display:none; }
+
+/* =========================
+   Drawer
+========================= */
+.nav-backdrop{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.55);
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .18s ease;
+  z-index:40;
+}
+
+.nav-drawer{
+  position:fixed;
+  top:0;
+  right:0;
+  width:min(320px, 86vw);
+  height:100%;
+  background: rgba(12,15,22,.96);
+  border-left:1px solid var(--line);
+  transform: translateX(100%);
+  transition: transform .18s ease;
+  z-index:41;
+  display:flex;
+  flex-direction:column;
+  padding:14px;
+}
+
+.nav-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--line);
+}
+
+.nav-title{
+  color:var(--muted);
+  font-size:13px;
+  letter-spacing:.4px;
+}
+
+.nav-close{
+  width:40px;
+  height:40px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.03);
+  color:var(--text);
+  cursor:pointer;
+  font-size:22px;
+  line-height:0;
+}
+
+.nav-links{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:12px 0;
+}
+
+.nav-links a{
+  text-decoration:none;
+  color:var(--text);
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.02);
+  padding:12px 12px;
+  border-radius:14px;
+}
+.nav-links a:hover{ border-color: rgba(255,255,255,.18); }
+
+/* open state */
+.nav-open .nav-backdrop{ opacity:1; pointer-events:auto; }
+.nav-open .nav-drawer{ transform: translateX(0); }
+
+/* =========================
+   Token bar (shown after wallet connect)
+========================= */
+.hdr-tokenbar{
+  border-top:1px solid var(--line);
+  background: rgba(0,0,0,.18);
+}
+.tokenbar-inner{
+  max-width:1100px;
+  margin:0 auto;
+  padding:10px 18px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.tok{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.03);
+  padding:8px 10px;
+  border-radius:999px;
+  font-size:12px;
+}
+.tok .s{ color:var(--muted); }
+.tok .a{ color:var(--text); font-variant-numeric: tabular-nums; }
+.tok.loading .a{ color:var(--muted); }
+
+/* =========================
+   Content
+========================= */
+.page-title{ margin:14px 0 14px; font-size:22px; letter-spacing:.4px; }
+
+.hero{
+  border:1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  border-radius:18px;
+  padding:18px 16px;
+}
+.hero h1{ margin:2px 0 10px; font-size:26px; }
+
+.desc{ margin:0; color:var(--muted); line-height:1.6; }
+.hero-actions{ margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; }
+
+.card{
+  margin-top:14px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.03);
+  border-radius:18px;
+  padding:14px;
+}
+.card-h{ font-size:14px; color:var(--muted); margin-bottom:10px; letter-spacing:.4px; }
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:10px;
+}
+@media (max-width: 720px){
+  .grid{ grid-template-columns: 1fr; }
+}
+
+.kv{
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.18);
+  border-radius:14px;
+  padding:10px 12px;
+}
+.kv .k{ font-size:12px; color:var(--muted); }
+.kv .v{ margin-top:6px; font-size:13px; word-break:break-all; }
+
+.row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+.input{
+  width:min(320px, 100%);
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.25);
+  color:var(--text);
+  padding:12px 12px;
+  border-radius:14px;
+  outline:none;
+}
+.input:focus{ border-color: rgba(120,170,255,.35); }
+
+.pill{
+  border:1px solid var(--line);
+  background: var(--pill);
+  color:var(--muted);
+  padding:8px 10px;
+  border-radius:999px;
+  font-size:12px;
+}
+
+.note{ margin-top:10px; color:var(--muted); font-size:12px; }
+.ol{ margin:0; padding-left:18px; color:var(--muted); line-height:1.7; }
+
+/* =========================
+   Footer
+========================= */
+.footer-wrap{
+  margin-top:38px;
+  border-top:1px solid var(--line2);
+  background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.00));
+}
+
+.footer-inner{
+  max-width:1100px;
+  margin:0 auto;
+  padding:18px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.footer-left{ display:flex; align-items:center; gap:12px; }
+.footer-logo{ width:34px; height:34px; border-radius:10px; object-fit:cover; }
+.footer-title{ font-size:14px; }
+.footer-sub{ font-size:12px; color:var(--muted); margin-top:4px; }
+
+.footer-right .link{
+  color:var(--muted);
+  text-decoration:none;
+  border:1px solid var(--line);
+  padding:10px 12px;
+  border-radius:14px;
+  background: rgba(255,255,255,.02);
+}
+.footer-right .link:hover{ color:var(--text); border-color: rgba(255,255,255,.18); }
+/* 온체인 야광 */
+.onchain{
+  color:#a6ff4d;
+  text-shadow: 0 0 10px rgba(166,255,77,.55);
+}
+.onchain-strong{
+  color:#00ffea;
+  text-shadow: 0 0 12px rgba(0,255,234,.65);
+}
+.onchain-warn{
+  color:#ffcc00;
+  text-shadow: 0 0 12px rgba(255,204,0,.55);
+}
+
+/* 데스크탑은 메뉴 보이고, 모바일에서만 햄버거 */
+.desktop-nav{ display:flex; gap:14px; }
+@media (max-width: 900px){
+  .desktop-nav{ display:none; }
+  .burger{ display:flex; }
+}
+@media (min-width: 901px){
+  .burger{ display:none; }
+}
+/* =========================
+   HEADER NAV (mypage / 게임) BEAUTIFY
+   ========================= */
+
+/* 데스크탑 메뉴 영역 */
+.top-header .desktop-nav{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+
+/* 데스크탑 메뉴 링크를 pill 버튼처럼 */
+.top-header .desktop-nav a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: rgba(234,241,255,0.86);
+  text-decoration: none;
+
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+
+  transition: transform .15s ease, background .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.top-header .desktop-nav a:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+  color: rgba(234,241,255,0.98);
+}
+
+/* 현재 페이지 강조: body에 data-page 붙이는 방식(선택) */
+body[data-page="mypage"] .top-header .desktop-nav a[href="mypage.html"],
+body[data-page="offchain"] .top-header .desktop-nav a[href="offchain.html"]{
+  background: linear-gradient(135deg, rgba(124,243,255,0.22), rgba(74,163,255,0.18));
+  border-color: rgba(124,243,255,0.35);
+  color: rgba(234,241,255,1);
+  box-shadow: 0 10px 24px rgba(74,163,255,0.12);
+}

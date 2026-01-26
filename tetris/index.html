@@ -1,0 +1,83 @@
+<!-- /tetris/index.html -->
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tetris (Vanilla JS)</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">TETRIS</div>
+      <div class="hint">← → 이동 · ↓ 소프트드롭 · ↑ 회전 · Space 하드드롭 · C 홀드 · P 일시정지 · R 재시작</div>
+    </header>
+
+    <main class="layout">
+      <section class="board-wrap">
+        <canvas id="board" width="300" height="600" aria-label="tetris board"></canvas>
+        <div class="overlay" id="overlay">
+          <div class="overlay-card">
+            <div class="overlay-title" id="overlayTitle">READY</div>
+            <div class="overlay-desc" id="overlayDesc">Space: 시작 / P: 일시정지</div>
+            <div class="overlay-actions">
+              <button id="btnStart" class="btn">시작</button>
+              <button id="btnReset" class="btn btn--ghost">초기화</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="side">
+        <div class="panel">
+          <div class="panel-title">NEXT</div>
+          <canvas id="next" width="120" height="120"></canvas>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">HOLD</div>
+          <canvas id="hold" width="120" height="120"></canvas>
+        </div>
+
+        <div class="panel">
+          <div class="stats">
+            <div class="stat">
+              <div class="k">SCORE</div>
+              <div class="v" id="score">0</div>
+            </div>
+            <div class="stat">
+              <div class="k">LINES</div>
+              <div class="v" id="lines">0</div>
+            </div>
+            <div class="stat">
+              <div class="k">LEVEL</div>
+              <div class="v" id="level">1</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel--small">
+          <div class="panel-title">CONTROLS</div>
+          <ul class="list">
+            <li>←/→: 좌/우</li>
+            <li>↓: 소프트드롭</li>
+            <li>↑: 회전 (시계)</li>
+            <li>Z: 반시계 회전</li>
+            <li>Space: 하드드롭</li>
+            <li>C: 홀드</li>
+            <li>P: 일시정지</li>
+            <li>R: 리셋</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="foot">
+      <span>Vanilla JS · 10x20 · SRS 느낌 회전 + 간단 벽킥</span>
+    </footer>
+  </div>
+
+  <script src="./game.js"></script>
+</body>
+</html>

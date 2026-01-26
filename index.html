@@ -1,0 +1,74 @@
+<!-- /index.html -->
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PAW DAO</title>
+
+  <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body>
+  <div class="page">
+    <div id="site-header"></div>
+
+    <main class="main-wrap">
+      <section class="hero">
+        <h1>PAW DAO에 오신걸 환영합니다</h1>
+
+        <p class="desc">
+          24시간마다 배당 인출 · 1HEX 이상 기부 시 배당 시작 · 게임 점수로 배당 파워 증가<br>
+          자세한 규칙/공시는 intro 페이지에서 확인하세요.
+          본 DAO의 주인은 게임에 참여하는 여러분과  PUT토큰 소유자입니다.<br>
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn" href="mypage.html">기부하기</a>
+          <a class="btn ghost" href="offchain.html">게임</a>
+          <a class="btn ghost" href="intro.html">소개/공시</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-h">지갑 연결 정보</div>
+
+        <div class="grid">
+          <div class="kv"><div class="k">지갑</div><div class="v" id="wAddr">-</div></div>
+          <div class="kv"><div class="k">네트워크</div><div class="v" id="wNet">-</div></div>
+
+          <div class="kv"><div class="k">내 HEX 기부(deposited)</div><div class="v" id="uDeposited">-</div></div>
+          <div class="kv"><div class="k">내 누적배당(세전 totalPaid)</div><div class="v" id="uTotalPaid">-</div></div>
+
+          <div class="kv"><div class="k">내 배당파워(dividendPower)</div><div class="v" id="uPower">-</div></div>
+          <div class="kv"><div class="k">챔피온 여부</div><div class="v" id="uChampion">-</div></div>
+
+          <div class="kv"><div class="k">게임 pending</div><div class="v" id="uPending">-</div></div>
+          <div class="kv"><div class="k">pending 시작</div><div class="v" id="uPendingAt">-</div></div>
+
+          <div class="kv"><div class="k">분자(numerator)</div><div class="v" id="uNum">-</div></div>
+          <div class="kv"><div class="k">분모(denominator)</div><div class="v" id="uDen">-</div></div>
+
+          <div class="kv"><div class="k">계약 HEX 잔액</div><div class="v" id="cHex">-</div></div>
+          <div class="kv"><div class="k">TaxPool / Threshold</div><div class="v" id="cTax">-</div></div>
+
+          <div class="kv"><div class="k">pendingTimeout</div><div class="v" id="cTimeout">-</div></div>
+        </div>
+
+        <div class="note">지갑 연결 시 자동으로 갱신됩니다.</div>
+      </section>
+    </main>
+
+    <div id="site-footer"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.14.0/dist/ethers.umd.min.js"></script>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/wallet.js"></script>
+  <script src="assets/js/partials.js"></script>
+
+  <!-- header.js는 partial 주입이 끝난 다음에 1번만 -->
+  <script src="assets/js/header.js"></script>
+  <script defer src="assets/js/pages/index.js"></script>
+</body>
+</html>

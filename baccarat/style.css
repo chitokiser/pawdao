@@ -1,0 +1,452 @@
+/* \baccarat\style.css (전체 교체) */
+
+:root{
+  --bg: #070a09;
+  --table: #0f3b2f;
+  --table2:#0a2a21;
+
+  --text:#e9f5ef;
+  --muted: rgba(233,245,239,.72);
+
+  --line: rgba(255,255,255,.10);
+  --line2: rgba(255,255,255,.06);
+
+  --gold:#ffd60a;
+  --neon:#29ffc6;
+  --neon2:#35b6ff;
+  --danger:#ff3b5c;
+
+  --shadow: 0 18px 60px rgba(0,0,0,.55);
+  --shadow2: 0 8px 24px rgba(0,0,0,.45);
+
+  --r16: 16px;
+  --r20: 20px;
+
+  /* 스테이지 기준 사이즈(세로형) */
+  --stage-w: 390px;
+  --stage-h: 720px;
+
+  /* 실제 카드 비율(포커카드 2.5:3.5 = 5:7) */
+  --card-ratio: 5 / 7;
+
+  /* 카드 폭(높이는 aspect-ratio로 자동) */
+  --card-w: 92px;
+
+  /* 카드 뒷면 이미지 (프로젝트에 파일 추가) */
+  --card-back-url: url("./images/card_back.png");
+}
+
+*{ box-sizing:border-box; }
+html, body{ height:100%; }
+
+body{
+  margin:0;
+  background:
+    radial-gradient(900px 600px at 50% 20%, rgba(41,255,198,.10), transparent 55%),
+    radial-gradient(900px 600px at 85% 30%, rgba(53,182,255,.10), transparent 55%),
+    radial-gradient(900px 700px at 40% 80%, rgba(255,214,10,.10), transparent 55%),
+    linear-gradient(180deg, #050707, var(--bg));
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--text);
+  overflow:hidden;
+}
+
+/* 전체 화면(스크롤 금지) */
+.viewport{
+  width: 100vw;
+  height: 100svh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding: 10px;
+}
+
+/* 스케일 적용 래퍼 */
+.scale-wrap{
+  transform-origin: top center;
+  will-change: transform;
+}
+
+/* 스테이지 */
+.baccarat-stage{
+  width: var(--stage-w);
+  height: var(--stage-h);
+  border-radius: 20px;
+  overflow:hidden;
+  position:relative;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255,255,255,.10);
+  background:
+    radial-gradient(140% 100% at 50% 20%, rgba(255,255,255,.10), transparent 60%),
+    radial-gradient(120% 90% at 80% 30%, rgba(41,255,198,.10), transparent 60%),
+    radial-gradient(120% 90% at 20% 70%, rgba(53,182,255,.10), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+    linear-gradient(180deg, var(--table), var(--table2));
+  display:flex;
+  flex-direction:column;
+}
+
+/* 카드 FX 레이어 */
+.fx-layer{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index: 50;
+}
+
+/* 상단바 */
+.topbar{
+  padding: calc(10px + env(safe-area-inset-top)) 12px 8px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 10px;
+  background: rgba(0,0,0,.14);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.balance{
+  font-size: 13px;
+  opacity: .92;
+}
+
+/* 슈박스 */
+.card-shoe{
+  width: 54px;
+  height: 74px;
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06)),
+    linear-gradient(180deg, #9a6e5f, #6f5249);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: var(--shadow2);
+  display:flex;
+  flex-direction:column;
+  padding: 6px;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.card-shoe .card-stack{
+  flex: 1;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(230,230,230,.95));
+  border: 1px solid rgba(0,0,0,.10);
+  box-shadow: inset 0 0 8px rgba(0,0,0,.20);
+}
+.card-shoe .slot{
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.45);
+  box-shadow: inset 0 0 4px rgba(255,255,255,.12);
+}
+
+/* 중앙: 카드/결과 영역(스크롤 없음) */
+.playfield{
+  flex: 1 1 auto;
+  padding: 8px 12px 6px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+}
+
+.result{
+  text-align:center;
+  font-size: 17px;
+  color: var(--gold);
+  letter-spacing: .6px;
+  margin-top: 0;
+  min-height: 20px;
+  text-shadow:
+    0 0 14px rgba(255,214,10,.25),
+    0 0 22px rgba(255,214,10,.18);
+}
+
+/* 양손 동시 표시 */
+.hands{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.hand-wrap{
+  border-radius: var(--r20);
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(0,0,0,.14);
+  padding: 10px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+.label{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing:.6px;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.22);
+  margin-bottom: 8px;
+  flex: 0 0 auto;
+}
+.label::before{
+  content:"";
+  width:8px; height:8px;
+  border-radius:999px;
+  display:inline-block;
+}
+.banker-label::before{ background: var(--neon2); box-shadow: 0 0 10px rgba(53,182,255,.55); }
+.player-label::before{ background: var(--danger); box-shadow: 0 0 10px rgba(255,59,92,.55); }
+
+/* 손패 슬롯 3개 */
+.hand{
+  display:flex;
+  gap: 10px;
+  align-items:flex-start;
+  justify-content:flex-start;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* 슬롯: 실제 카드 비율 강제 (찐카드 느낌) */
+.card-slot{
+  width: var(--card-w);
+  aspect-ratio: var(--card-ratio);
+  height: auto;                   /* 고정 height 제거 */
+  border-radius: 12px;
+  border: 1px dashed rgba(255,255,255,.18);
+  background: rgba(0,0,0,.10);
+  box-shadow: inset 0 0 10px rgba(0,0,0,.25);
+  position:relative;
+  overflow:hidden;
+}
+
+/* 플립 카드 */
+.card-container{
+  width: 100%;
+  height: 100%;
+  perspective: 1000px;
+}
+
+/* 카드가 꽂힐 때 '튀기듯' 스냅(0.12초) */
+.card-container.snap-in{
+  animation: snapIn 120ms ease-out;
+}
+@keyframes snapIn{
+  0%   { transform: scale(.92); }
+  70%  { transform: scale(1.05); }
+  100% { transform: scale(1.00); }
+}
+
+.card-inner{
+  width:100%;
+  height:100%;
+  position:relative;
+  transform-style: preserve-3d;
+  transition: transform .55s ease;
+}
+
+.card-front, .card-back{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border-radius: 12px;
+  backface-visibility: hidden;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:
+    0 10px 20px rgba(0,0,0,.36),
+    0 0 0 1px rgba(0,0,0,.12);
+}
+
+/* 앞면: 왜곡 없이 카드처럼 보이게 (contain + 여백) */
+.card-front{
+  transform: rotateY(180deg);
+  object-fit: contain;            /* cover -> contain */
+  padding: 6px;                   /* 흰 여백 */
+  display:block;
+  background:#fff;
+}
+
+/* 뒷면: 블루 백 패턴 이미지 */
+.card-back{
+  transform: rotateY(0deg);
+  background-image: var(--card-back-url);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* flip */
+.card-inner.flip{
+  transform: rotateY(180deg);
+}
+
+/* 날아가는 카드(뒷면 이미지 적용 + 비율 유지) */
+.fly-card{
+  position:fixed;
+  width: var(--card-w);
+  aspect-ratio: var(--card-ratio);
+  height: auto;
+  border-radius: 12px;
+  background-image: var(--card-back-url);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.45),
+    0 0 0 1px rgba(0,0,0,.12);
+  transform: translate3d(0,0,0) rotate(0deg);
+  transition: transform 420ms cubic-bezier(.2,.9,.2,1), opacity 420ms ease;
+  opacity: 1;
+  z-index: 100;
+}
+
+/* 힌트 */
+.hint{
+  font-size: 11px;
+  color: var(--muted);
+  padding: 6px 9px;
+  border-radius: 12px;
+  border: 1px dashed rgba(255,255,255,.10);
+  background: rgba(0,0,0,.10);
+}
+
+/* 하단 Dock: 전체 높이 줄이기 */
+.dock{
+  flex: 0 0 auto;
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  background: rgba(0,0,0,.28);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255,255,255,.08);
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+}
+
+/* 베팅 영역 */
+.bet-area{
+  width: 100%;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px;
+  border-radius: var(--r20);
+  background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.06));
+  border: 1px solid rgba(41,255,198,.22);
+  box-shadow: 0 0 22px rgba(41,255,198,.10);
+  position: relative;
+}
+
+.bet{
+  height: 38px;
+  border-radius: 12px;
+  color: rgba(255,255,255,.92);
+  font-size: 13px;
+  cursor:pointer;
+  position: relative;
+  overflow:hidden;
+  background: rgba(0,0,0,.25);
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 10px 18px rgba(0,0,0,.20);
+  transition: transform .12s ease, border-color .2s ease, filter .12s ease;
+}
+.bet:active{ transform: scale(.98); }
+
+.bet.banker{ border-color: rgba(53,182,255,.28); }
+.bet.player{ border-color: rgba(255,59,92,.26); }
+.bet.bpair{ border-color: rgba(255,159,28,.28); }
+.bet.ppair{ border-color: rgba(41,255,198,.26); }
+.bet.tie{ grid-column: 1 / -1; border-color: rgba(255,214,10,.30); }
+
+.bet.active{
+  color: #06110d;
+  background:
+    radial-gradient(120% 120% at 20% 20%, rgba(255,255,255,.45), transparent 45%),
+    linear-gradient(180deg, rgba(255,214,10,.95), rgba(255,183,3,.90));
+  border-color: rgba(255,214,10,.55);
+  box-shadow: 0 0 22px rgba(255,214,10,.18);
+}
+
+/* 칩 스택 */
+.chip-stack{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+.stack-chip{
+  width: 28px;
+  position:absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 10px 16px rgba(0,0,0,.45));
+}
+
+/* 칩 */
+.chips{
+  width: 100%;
+  display:flex;
+  gap: 10px;
+  overflow:hidden;
+  justify-content:space-between;
+  padding: 0 6px;
+}
+.chip{
+  width: 40px;
+  cursor:pointer;
+  filter: drop-shadow(0 10px 16px rgba(0,0,0,.36));
+  transition: transform .16s ease;
+}
+.chip:active{ transform: translateY(-5px) scale(1.08); }
+
+/* 액션 */
+.actions{
+  width: 100%;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.actions button{
+  height: 40px;
+  border: none;
+  border-radius: 14px;
+  cursor:pointer;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: .2px;
+  color: #06110d;
+  background:
+    radial-gradient(120% 120% at 25% 25%, rgba(255,255,255,.55), transparent 40%),
+    linear-gradient(180deg, rgba(255,214,10,.95), rgba(255,183,3,.90));
+  box-shadow: 0 12px 22px rgba(0,0,0,.26);
+  transition: transform .12s ease, filter .12s ease;
+}
+.actions button:active{ transform: scale(.98); }
+
+.actions button.end{
+  background:
+    radial-gradient(120% 120% at 25% 25%, rgba(255,255,255,.45), transparent 40%),
+    linear-gradient(180deg, rgba(41,255,198,.92), rgba(53,182,255,.82));
+}
+
+.footnote{
+  font-size: 10.5px;
+  color: var(--muted);
+  padding: 0 4px;
+  opacity: .95;
+}
+
+/* 화면이 더 낮은 기기: 카드 폭만 줄이고 비율은 유지 */
+@media (max-height: 720px){
+  :root{ --card-w: 88px; }
+}
+@media (max-height: 680px){
+  :root{ --card-w: 84px; }
+}
