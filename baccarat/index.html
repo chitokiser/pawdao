@@ -1,0 +1,93 @@
+<!-- \baccarat\index.html (전체 교체) -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>모바일 바카라</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 화면 맞춤 스케일 래퍼 -->
+  <div class="viewport">
+    <div class="scale-wrap" id="scaleWrap">
+      <div class="baccarat-stage" id="stage">
+
+        <!-- 카드 날아다니는 FX 레이어 -->
+        <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
+
+        <!-- 상단바 -->
+        <div class="topbar">
+          <div class="balance">점수: <span id="balance">0</span></div>
+
+          <div class="card-shoe" aria-label="shoe">
+            <div class="card-stack"></div>
+            <div class="slot" id="shoeSlot"></div>
+          </div>
+        </div>
+
+        <!-- 중앙: 카드/결과 영역 (스크롤 없음) -->
+        <div class="playfield">
+          <div class="result" id="result"></div>
+
+          <!-- 양쪽 hand가 항상 동시에 보이게 2열 -->
+          <div class="hands">
+            <div class="hand-wrap banker">
+              <div class="label banker-label">Banker</div>
+              <div class="hand" id="banker-hand"></div>
+            </div>
+
+            <div class="hand-wrap player">
+              <div class="label player-label">Player</div>
+              <div class="hand" id="player-hand"></div>
+            </div>
+          </div>
+
+          <div class="hint">
+            START → 베팅 → DEAL 반복 → END (점수 저장 후 복귀)
+          </div>
+        </div>
+
+        <!-- 하단 Dock: 항상 표시 -->
+        <div class="dock">
+          <div class="bet-area">
+            <button class="bet banker" id="banker-bet">BANKER<div class="chip-stack"></div></button>
+            <button class="bet player" id="player-bet">PLAYER<div class="chip-stack"></div></button>
+            <button class="bet bpair" id="bpair-bet">B PAIR<div class="chip-stack"></div></button>
+            <button class="bet ppair" id="ppair-bet">P PAIR<div class="chip-stack"></div></button>
+            <button class="bet tie" id="tie-bet">TIE<div class="chip-stack"></div></button>
+          </div>
+
+          <div class="chips">
+            <img class="chip" data-value="10"  src="./images/chip_10.png"  alt="chip 10">
+            <img class="chip" data-value="50"  src="./images/chip_50.png"  alt="chip 50">
+            <img class="chip" data-value="100" src="./images/chip_100.png" alt="chip 100">
+            <img class="chip" data-value="500" src="./images/chip_500.png" alt="chip 500">
+          </div>
+
+          <div class="actions">
+            <button id="start">START (100점)</button>
+            <button id="deal">DEAL</button>
+            <button id="reset">RESET</button>
+            <button id="end" class="end">END (점수저장)</button>
+          </div>
+
+          <div class="footnote">
+            저장: localStorage paw_score_baccarat → return 파라미터로 복귀
+          </div>
+        </div>
+
+        <!-- 사운드 -->
+        <audio id="sound-bet" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" preload="auto"></audio>
+        <audio id="sound-win" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+        <audio id="sound-lose" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
+        <audio id="sound-wind" src="https://actions.google.com/sounds/v1/foley/cloth_swipe.ogg" preload="auto"></audio>
+        <audio id="sound-click" src="https://actions.google.com/sounds/v1/cartoon/button_click.ogg" preload="auto"></audio>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

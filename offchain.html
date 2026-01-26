@@ -1,0 +1,149 @@
+<!-- /offchain.html -->
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PAW DAO - 오프체인게임</title>
+
+  <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body>
+  <div class="page">
+    <div id="site-header"></div>
+
+    <main class="main-wrap">
+      <h1 class="page-title">오프체인게임</h1>
+
+      <section class="card">
+        <div class="card-h">플로우</div>
+        <ol class="ol">
+          <li>지갑 연결</li>
+          <li>게임 시작(joinGame)</li>
+          <li>게임 실행(바카라/테트리스)</li>
+          <li>게임에서 END 누르면 점수+서명 저장 → 이 페이지로 복귀</li>
+          <li>결과 저장(saveGame)</li>
+        </ol>
+      </section>
+
+      <section class="card">
+        <div class="card-h">상태</div>
+        <div class="grid">
+          <div class="kv"><div class="k">pending</div><div class="v onchain" id="uPending">-</div></div>
+          <div class="kv"><div class="k">pendingAt</div><div class="v onchain" id="uPendingAt">-</div></div>
+          <div class="kv"><div class="k">timeout</div><div class="v onchain" id="uTimeout">-</div></div>
+          <div class="kv"><div class="k">numerator</div><div class="v onchain" id="uNum">-</div></div>
+          <div class="kv"><div class="k">배당파워</div><div class="v onchain" id="uPower">-</div></div>
+        </div>
+      </section>
+
+      <!-- 바카라 게임 카드 -->
+      <section class="card game-card">
+        <div class="card-h">바카라</div>
+
+        <div class="row" style="margin-bottom:10px;">
+          <button class="btn" id="btnJoin">바카라 게임 시작 (joinGame)</button>
+          <div class="pill" id="joinHint">-</div>
+        </div>
+        <div class="note">
+          게임 시작 시 pending 상태가 됩니다. (타임아웃 지나면 자동 해제)
+        </div>
+
+        <div class="hr" style="margin:14px 0;"></div>
+
+        <div class="row" style="margin-bottom:10px;">
+          <div class="pill">점수</div>
+          <div class="pill onchain" id="bScore">-</div>
+          <button class="btn" id="btnSaveB">결과 저장 (saveGame)</button>
+          <div class="pill" id="saveHintB">-</div>
+        </div>
+        <div class="note">pending 상태에서만 saveGame이 됩니다. 점수 직접 입력은 없습니다.</div>
+
+        <div class="hr" style="margin:14px 0;"></div>
+
+        <div class="row">
+          <a class="btn ghost" href="#" id="btnOpenBaccarat">바카라 게임 실행</a>
+          <div class="pill" id="openHintB">-</div>
+        </div>
+
+        <div class="note">
+          바카라 페이지에서 END를 누르면 점수가 저장되고, 다시 이 페이지로 돌아옵니다.
+        </div>
+      </section>
+
+      <!-- 테트리스 게임 카드 -->
+      <section class="card game-card">
+        <div class="card-h">테트리스</div>
+
+        <div class="row" style="margin-bottom:10px;">
+          <button class="btn" id="btnJoinT">테트리스 게임 시작 (joinGame)</button>
+          <div class="pill" id="joinHintT">-</div>
+        </div>
+        <div class="note">게임 시작 시 pending 상태가 됩니다. (타임아웃 지나면 자동 해제)</div>
+
+        <div class="hr" style="margin:14px 0;"></div>
+
+        <div class="row" style="margin-bottom:10px;">
+          <div class="pill">점수</div>
+          <div class="pill onchain" id="tScore">-</div>
+          <button class="btn" id="btnSaveT">결과 저장 (saveGame)</button>
+          <div class="pill" id="saveHintT">-</div>
+        </div>
+        <div class="note">pending 상태에서만 saveGame이 됩니다. 점수 직접 입력은 없습니다.</div>
+
+        <div class="hr" style="margin:14px 0;"></div>
+
+        <div class="row">
+          <a class="btn ghost" href="#" id="btnOpenTetris">테트리스 게임 실행</a>
+          <div class="pill" id="openHintT">-</div>
+        </div>
+
+        <div class="note">테트리스에서 END를 누르면 점수+서명이 저장되고, 다시 이 페이지로 돌아옵니다.</div>
+      </section>
+
+      <!-- 벽돌깨기 게임 카드 -->
+      <section class="card game-card">
+        <div class="card-h">벽돌깨기</div>
+
+        <div class="row" style="margin-bottom:10px;">
+          <button class="btn" id="btnJoinBr">벽돌깨기 게임 시작 (joinGame)</button>
+          <div class="pill" id="joinHintBr">-</div>
+        </div>
+        <div class="note">게임 시작 시 pending 상태가 됩니다. (타임아웃 지나면 자동 해제)</div>
+
+        <div class="hr" style="margin:14px 0;"></div>
+
+        <div class="row" style="margin-bottom:10px;">
+          <div class="pill">점수</div>
+          <div class="pill onchain" id="brScore">-</div>
+          <button class="btn" id="btnSaveBr">결과 저장 (saveGame)</button>
+          <div class="pill" id="saveHintBr">-</div>
+        </div>
+        <div class="note">pending 상태에서만 saveGame이 됩니다. 점수 직접 입력은 없습니다.</div>
+
+        <div class="hr" style="margin:14px 0;"></div>
+
+        <div class="row">
+          <a class="btn ghost" href="#" id="btnOpenBreakout">벽돌깨기 게임 실행</a>
+          <div class="pill" id="openHintBr">-</div>
+        </div>
+
+        <div class="note">벽돌깨기에서 END를 누르면 점수+서명이 저장되고, 다시 이 페이지로 돌아옵니다.</div>
+      </section>
+    </main>
+
+    <div id="site-footer"></div>
+  </div>
+
+  <!-- 스크립트는 body 끝에서 1번만 로드 -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.14.0/dist/ethers.umd.min.js"></script>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/wallet.js"></script>
+<script src="assets/js/partials.js"></script>
+
+<!-- header.js는 partial 주입이 끝난 다음에 1번만 -->
+<script src="assets/js/header.js"></script>
+  <script defer src="assets/js/pages/offchain.js"></script>
+</body>
+</html>

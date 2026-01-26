@@ -1,0 +1,69 @@
+<!-- /breakout/index.html -->
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Breakout (Vanilla JS)</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">BRICK BREAKER</div>
+      <div class="hint">← → 이동 · Space 시작/발사 · P 일시정지 · R 리셋</div>
+    </header>
+
+    <main class="layout">
+      <section class="board-wrap">
+        <canvas id="cv" width="820" height="520" aria-label="breakout canvas"></canvas>
+
+        <div class="overlay" id="overlay">
+          <div class="overlay-card">
+            <div class="overlay-title" id="ovTitle">READY</div>
+            <div class="overlay-desc" id="ovDesc">Space: 시작 / P: 일시정지</div>
+            <div class="overlay-actions">
+              <button id="btnStart" class="btn">시작</button>
+              <button id="btnReset" class="btn btn--ghost">초기화</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="side">
+        <div class="panel">
+          <div class="stats">
+            <div class="stat">
+              <div class="k">SCORE</div>
+              <div class="v" id="score">0</div>
+            </div>
+            <div class="stat">
+              <div class="k">LIVES</div>
+              <div class="v" id="lives">3</div>
+            </div>
+            <div class="stat">
+              <div class="k">LEVEL</div>
+              <div class="v" id="level">1</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel--small">
+          <div class="panel-title">TIP</div>
+          <ul class="list">
+            <li>벽돌 1개 = 5점</li>
+            <li>레벨 클리어마다 공속도 +10%</li>
+            <li>END 버튼으로 점수 저장 후 오프체인으로 복귀</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="foot">
+      <span>Vanilla JS · Canvas · 간단 물리</span>
+    </footer>
+  </div>
+
+  <script src="./game.js"></script>
+</body>
+</html>
