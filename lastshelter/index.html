@@ -1,0 +1,45 @@
+<!-- /index.html -->
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>Crowd Shooter Prototype</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="hud">
+      <div class="left">
+        <div class="badge">stage <span id="uiStage">1</span></div>
+        <div class="badge">allies <span id="uiAllies">1</span></div>
+        <div class="badge">dps <span id="uiDps">10</span></div>
+      </div>
+      <div class="right">
+        <button id="btnPause" class="btn">pause</button>
+        <button id="btnRestart" class="btn">restart</button>
+      </div>
+    </header>
+
+    <main class="game">
+      <canvas id="c"></canvas>
+
+      <div class="overlay" id="overlay">
+        <div class="panel">
+          <div class="title" id="ovTitle">ready</div>
+          <div class="desc" id="ovDesc">click / tap to start</div>
+          <button id="btnStart" class="btn big">start</button>
+        </div>
+      </div>
+
+      <div class="toast" id="toast"></div>
+    </main>
+
+    <footer class="tip">
+      좌우로 이동: 마우스 드래그/터치 드래그 또는 방향키 · 게이트는 통과하면 적용 · 보스는 일정 웨이브마다 등장
+    </footer>
+  </div>
+
+  <script src="./game.js"></script>
+</body>
+</html>

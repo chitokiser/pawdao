@@ -14,22 +14,27 @@
 }
 
 *{ box-sizing:border-box; }
-html,body{ height:100%; }
+html,body{ height:100%; overflow-x:hidden; }  /* 가로 스크롤 완전 차단 */
 
 body{
   margin:0;
-background:
-  radial-gradient(800px 420px at 20% -12%, rgba(88,140,255,.16), transparent 60%),
-  radial-gradient(700px 380px at 80% -14%, rgba(255,170,70,.08), transparent 58%),
-  var(--bg);
-
-
+  background:
+    radial-gradient(800px 420px at 20% -12%, rgba(88,140,255,.16), transparent 60%),
+    radial-gradient(700px 380px at 80% -14%, rgba(255,170,70,.08), transparent 58%),
+    var(--bg);
   color:var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Apple SD Gothic Neo, "Noto Sans KR", sans-serif;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
 
 .page{ min-height:100%; display:flex; flex-direction:column; }
-.main-wrap{ width:100%; max-width:1100px; margin:0 auto; padding:22px 18px 50px; flex:1; }
+.main-wrap{ width:100%; max-width:1100px; margin:0 auto; padding:20px 16px 50px; flex:1; }
+@media (max-width:500px){
+  .main-wrap{ padding:14px 12px 40px; }
+  .hero h1{ font-size:20px; }
+  .hero-actions{ gap:8px; }
+  .hero-actions .btn{ padding:9px 12px; font-size:13px; }
+  .footer-inner{ padding:14px 12px; }
+}
 
 /* =========================
    Header
@@ -37,50 +42,64 @@ background:
 .top-header{
   position:sticky;
   top:0;
-  z-index:20;
-  backdrop-filter: blur(10px);
-  background: rgba(10,12,18,.72);
+  z-index:200;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(10,12,18,.82);
   border-bottom:1px solid var(--line);
+  /* 헤더 자체는 overflow hidden 하지 않음 - 드롭다운이 아래로 나와야 하므로 */
 }
 
 .hdr-inner{
   max-width:1100px;
   margin:0 auto;
-  padding:14px 18px;
+  padding:10px 16px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:14px;
+  gap:12px;
+  min-height: 54px;
 }
 
 .brand{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px;
   text-decoration:none;
   color:var(--text);
+  flex-shrink:0;
 }
 .brand-logo{
-  width:34px;
-  height:34px;
-  border-radius:10px;
+  width:30px;
+  height:30px;
+  border-radius:8px;
   display:block;
   object-fit:cover;
 }
 .brand-name{
-  font-size:15px;
-  letter-spacing:.6px;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:.5px;
 }
 
-.hdr-right{ display:flex; align-items:center; gap:10px; }
+.hdr-right{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
 
 .net-badge{
-  font-size:12px;
+  font-size:11px;
   color:var(--muted);
   border:1px solid var(--line);
   background: rgba(255,255,255,.02);
-  padding:8px 10px;
-  border-radius:12px;
+  padding:6px 9px;
+  border-radius:10px;
+  white-space:nowrap;
+  max-width:90px;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 /* 버튼 */
@@ -89,135 +108,192 @@ background:
   border:1px solid var(--line2);
   background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
   color:var(--text);
-  padding:10px 12px;
-  border-radius:14px;
+  padding:8px 12px;
+  border-radius:12px;
+  font-size:13px;
   text-decoration:none;
   display:inline-flex;
   align-items:center;
   justify-content:center;
   gap:8px;
   user-select:none;
+  white-space:nowrap;
+  -webkit-tap-highlight-color: transparent;
 }
-.btn:hover{ border-color:rgba(255,255,255,.18); }
-.btn:active{ transform: translateY(1px); }
+.btn:hover{ border-color:rgba(255,255,255,.20); }
+.btn:active{ transform: translateY(1px); opacity:.85; }
 .btn.ghost{ background: rgba(255,255,255,.03); }
-/* =========================
-   Desktop nav + Mobile hamburger
-   - Desktop: nav ON, burger OFF
-   - <=900px: nav OFF, burger ON
-========================= */
 
-/* 데스크탑 기본: 메뉴 보이고 햄버거 숨김 */
-.nav{ display:flex; gap:14px; flex-wrap:wrap; }
+/* =========================
+   Desktop nav (≥ 900px)
+========================= */
+.desktop-nav{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.desktop-nav a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:7px 13px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:-.1px;
+  color:rgba(234,241,255,.86);
+  text-decoration:none;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  white-space:nowrap;
+  transition: background .18s, border-color .18s, color .18s, transform .12s;
+}
+.desktop-nav a:hover{
+  transform:translateY(-1px);
+  background: rgba(255,255,255,.10);
+  border-color: rgba(255,255,255,.20);
+  color:rgba(234,241,255,1);
+}
+
+/* 현재 페이지 강조 */
+body[data-page="mypage"]   .desktop-nav a[href="mypage.html"],
+body[data-page="offchain"] .desktop-nav a[href="offchain.html"]{
+  background: linear-gradient(135deg,rgba(124,243,255,.22),rgba(74,163,255,.18));
+  border-color:rgba(124,243,255,.35);
+  color:rgba(234,241,255,1);
+}
+
+/* 햄버거: 기본 숨김 */
 .burger{ display:none; }
 
-/* 햄버거 버튼 스타일(표시는 미디어쿼리에서) */
-.burger{
-  width:44px;
-  height:44px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background: rgba(255,255,255,.03);
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  gap:6px;
-  cursor:pointer;
-}
-.burger span{
-  width:18px;
-  height:2px;
-  background: rgba(255,255,255,.75);
-  border-radius:10px;
-}
-.burger:hover{ border-color: rgba(255,255,255,.18); }
-
-/* 모바일/태블릿: 메뉴 숨기고 햄버거 표시 */
+/* =========================
+   Mobile hamburger (≤ 900px)
+========================= */
 @media (max-width: 900px){
-  .nav{ display:none; }
-  .burger{ display:flex; }
+  .desktop-nav{ display:none; }
+
+  .burger{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:5px;
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background: rgba(255,255,255,.04);
+    cursor:pointer;
+    padding:0;
+    flex-shrink:0;
+    -webkit-tap-highlight-color:transparent;
+    transition: background .15s, border-color .15s;
+  }
+  .burger:hover{ border-color:rgba(255,255,255,.20); background:rgba(255,255,255,.07); }
+  .burger span{
+    width:16px;
+    height:2px;
+    background:rgba(255,255,255,.80);
+    border-radius:10px;
+    transition: transform .2s, opacity .2s;
+    display:block;
+  }
+  /* 열림 상태: X 모양 */
+  .nav-open .burger span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+  .nav-open .burger span:nth-child(2){ opacity:0; transform:scaleX(0); }
+  .nav-open .burger span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
 }
 
-
-/* 혹시 남아있을 수 있는 클래스 안전 처리 */
-.desktop-only{ display:none; }
+/* net-badge 모바일에서 축소 */
+@media (max-width: 500px){
+  .net-badge{ display:none; }
+  .hdr-inner{ padding:8px 12px; }
+}
 
 /* =========================
-   Drawer
+   Mobile dropdown menu
+   - 햄버거 클릭 → 헤더 바로 아래 드롭다운
+   - 측면 슬라이드 없음 → 화면 밀림 없음
 ========================= */
+
+/* backdrop: 드롭다운 뒤 어두운 배경 (클릭 시 닫힘) */
 .nav-backdrop{
   position:fixed;
   inset:0;
-  background: rgba(0,0,0,.55);
+  background:rgba(0,0,0,.45);
   opacity:0;
   pointer-events:none;
-  transition: opacity .18s ease;
-  z-index:40;
+  transition:opacity .18s ease;
+  z-index:199;
 }
+.nav-open .nav-backdrop{ opacity:1; pointer-events:auto; }
 
+/* 드롭다운 패널: 헤더 바로 아래에서 아래로 펼침 */
 .nav-drawer{
-  position:fixed;
-  top:0;
+  position:absolute;         /* fixed 아닌 absolute → 화면 밀림 없음 */
+  top:100%;                  /* 헤더 바로 아래 */
+  left:0;
   right:0;
-  width:min(320px, 86vw);
-  height:100%;
-  background: rgba(12,15,22,.96);
-  border-left:1px solid var(--line);
-  transform: translateX(100%);
-  transition: transform .18s ease;
-  z-index:41;
-  display:flex;
-  flex-direction:column;
-  padding:14px;
-}
-
-.nav-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding-bottom:10px;
+  z-index:201;
+  background:rgba(10,13,20,.96);
   border-bottom:1px solid var(--line);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+
+  /* 접힌 상태 */
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .22s cubic-bezier(.4,0,.2,1),
+             box-shadow .22s ease;
+  box-shadow:none;
+}
+.nav-open .nav-drawer{
+  max-height:200px;          /* 메뉴 아이템 수에 맞게 충분히 크게 */
+  box-shadow:0 8px 32px rgba(0,0,0,.35);
 }
 
-.nav-title{
-  color:var(--muted);
-  font-size:13px;
-  letter-spacing:.4px;
-}
+/* nav-top (MENU 타이틀 + X 버튼) — 드롭다운에선 숨김 */
+.nav-top{ display:none; }
 
-.nav-close{
-  width:40px;
-  height:40px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background: rgba(255,255,255,.03);
-  color:var(--text);
-  cursor:pointer;
-  font-size:22px;
-  line-height:0;
-}
-
+/* 드롭다운 내 링크: 가로 배치 */
 .nav-links{
   display:flex;
-  flex-direction:column;
+  flex-direction:row;       /* ← 세로 → 가로 */
+  flex-wrap:wrap;
   gap:8px;
-  padding:12px 0;
+  padding:12px 16px 14px;
+  align-items:center;
 }
 
 .nav-links a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px 16px;
+  border-radius:999px;      /* pill 스타일 */
+  font-size:13px;
+  font-weight:600;
+  color:rgba(234,241,255,.88);
   text-decoration:none;
-  color:var(--text);
-  border:1px solid var(--line);
-  background: rgba(255,255,255,.02);
-  padding:12px 12px;
-  border-radius:14px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  white-space:nowrap;
+  transition:background .15s, border-color .15s, color .15s;
+  -webkit-tap-highlight-color:transparent;
 }
-.nav-links a:hover{ border-color: rgba(255,255,255,.18); }
+.nav-links a:hover,
+.nav-links a:active{
+  background:rgba(255,255,255,.13);
+  border-color:rgba(255,255,255,.22);
+  color:rgba(234,241,255,1);
+}
 
-/* open state */
-.nav-open .nav-backdrop{ opacity:1; pointer-events:auto; }
-.nav-open .nav-drawer{ transform: translateX(0); }
+/* 데스크탑에선 드롭다운 완전히 숨김 */
+@media (min-width: 901px){
+  .nav-drawer{ display:none !important; }
+  .nav-backdrop{ display:none !important; }
+}
 
 /* =========================
    Token bar (shown after wallet connect)
@@ -365,57 +441,5 @@ background:
   text-shadow: 0 0 12px rgba(255,204,0,.55);
 }
 
-/* 데스크탑은 메뉴 보이고, 모바일에서만 햄버거 */
-.desktop-nav{ display:flex; gap:14px; }
-@media (max-width: 900px){
-  .desktop-nav{ display:none; }
-  .burger{ display:flex; }
-}
-@media (min-width: 901px){
-  .burger{ display:none; }
-}
-/* =========================
-   HEADER NAV (mypage / 게임) BEAUTIFY
-   ========================= */
-
-/* 데스크탑 메뉴 영역 */
-.top-header .desktop-nav{
-  display:flex;
-  align-items:center;
-  gap: 10px;
-}
-
-/* 데스크탑 메뉴 링크를 pill 버튼처럼 */
-.top-header .desktop-nav a{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  color: rgba(234,241,255,0.86);
-  text-decoration: none;
-
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-
-  transition: transform .15s ease, background .2s ease, border-color .2s ease, color .2s ease;
-}
-
-.top-header .desktop-nav a:hover{
-  transform: translateY(-1px);
-  background: rgba(255,255,255,0.10);
-  border-color: rgba(255,255,255,0.18);
-  color: rgba(234,241,255,0.98);
-}
-
-/* 현재 페이지 강조: body에 data-page 붙이는 방식(선택) */
-body[data-page="mypage"] .top-header .desktop-nav a[href="mypage.html"],
-body[data-page="offchain"] .top-header .desktop-nav a[href="offchain.html"]{
-  background: linear-gradient(135deg, rgba(124,243,255,0.22), rgba(74,163,255,0.18));
-  border-color: rgba(124,243,255,0.35);
-  color: rgba(234,241,255,1);
-  box-shadow: 0 10px 24px rgba(74,163,255,0.12);
-}
+/* 혹시 남아있을 수 있는 구형 클래스 */
+.desktop-only{ display:none; }

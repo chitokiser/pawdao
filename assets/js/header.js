@@ -5,56 +5,71 @@
 
   function qs(id) { return document.getElementById(id); }
 
+  /* ── 드롭다운 열기/닫기 ──────────────────────────────────── */
   function openNav(open) {
-    const body = document.body;
-    if (open) body.classList.add("nav-open");
-    else body.classList.remove("nav-open");
+    const body    = document.body;
+    const burger  = qs('btnBurger');
+
+    if (open) {
+      body.classList.add('nav-open');
+      if (burger) burger.setAttribute('aria-expanded', 'true');
+    } else {
+      body.classList.remove('nav-open');
+      if (burger) burger.setAttribute('aria-expanded', 'false');
+    }
   }
 
-  function bindHeaderOnce() {
-    const btnBurger = qs("btnBurger");
-    const navBackdrop = qs("navBackdrop");
-    const navDrawer = qs("navDrawer");
-    const btnConnect = qs("btnConnect");
+  function toggleNav() {
+    openNav(!document.body.classList.contains('nav-open'));
+  }
 
-    // 헤더가 아직 주입 전이면 false
+  /* ── 헤더 바인딩 ─────────────────────────────────────────── */
+  function bindHeaderOnce() {
+    const btnBurger   = qs('btnBurger');
+    const navBackdrop = qs('navBackdrop');
+    const navDrawer   = qs('navDrawer');
+    const btnConnect  = qs('btnConnect');
+
     if (!btnConnect || !btnBurger || !navBackdrop || !navDrawer) return false;
 
-    // 햄버거
-    btnBurger.onclick = () => openNav(true);
-    navBackdrop.onclick = () => openNav(false);
-    navDrawer.onclick = (e) => {
-      // 링크 클릭하면 닫기
-      const a = e.target?.closest?.("a");
-      if (a) openNav(false);
-    };
+    // 햄버거 토글
+    btnBurger.addEventListener('click', toggleNav);
 
-    // 지갑연결 버튼은 메뉴 밖(우측)
-    btnConnect.onclick = async () => {
+    // 배경 클릭 → 닫기
+    navBackdrop.addEventListener('click', () => openNav(false));
+
+    // 드롭다운 안 링크 클릭 → 닫기
+    navDrawer.addEventListener('click', (e) => {
+      if (e.target?.closest?.('a')) openNav(false);
+    });
+
+    // ESC 키 → 닫기
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') openNav(false);
+    });
+
+    // 지갑 연결 버튼
+    btnConnect.addEventListener('click', async () => {
       try {
-        btnConnect.textContent = "연결중...";
+        btnConnect.textContent = '연결중...';
         btnConnect.disabled = true;
-
         await Wallet.connect();
-
-        btnConnect.textContent = "연결됨";
+        btnConnect.textContent = '연결됨';
       } catch (e) {
-        btnConnect.textContent = "지갑연결";
-        alert(e?.shortMessage || e?.message || "지갑 연결 실패");
+        btnConnect.textContent = '지갑연결';
+        alert(e?.shortMessage || e?.message || '지갑 연결 실패');
       } finally {
         btnConnect.disabled = false;
       }
-    };
+    });
 
     // 이미 연결돼 있으면 토큰바 반영
-    setTimeout(() => {
-      Wallet.refreshTokenBar?.();
-    }, 50);
+    setTimeout(() => { Wallet.refreshTokenBar?.(); }, 50);
 
     return true;
   }
 
-  // partials 주입 타이밍 대응: 반복 체크
+  /* ── 파셜 주입 타이밍 대응: 반복 체크 ───────────────────── */
   function boot() {
     let tries = 0;
     const t = setInterval(() => {
@@ -67,19 +82,19 @@
     }, 50);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
   } else {
     boot();
   }
 
-  // 지갑 연결/해제 이벤트 시 버튼 텍스트 갱신
-  window.addEventListener("wallet:connected", () => {
-    const btn = qs("btnConnect");
-    if (btn) btn.textContent = "연결됨";
+  /* ── 지갑 연결/해제 이벤트 ───────────────────────────────── */
+  window.addEventListener('wallet:connected', () => {
+    const btn = qs('btnConnect');
+    if (btn) btn.textContent = '연결됨';
   });
-  window.addEventListener("wallet:disconnected", () => {
-    const btn = qs("btnConnect");
-    if (btn) btn.textContent = "지갑연결";
+  window.addEventListener('wallet:disconnected', () => {
+    const btn = qs('btnConnect');
+    if (btn) btn.textContent = '지갑연결';
   });
 })();

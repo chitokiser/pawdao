@@ -7,38 +7,33 @@
       <span class="brand-name">PAW DAO</span>
     </a>
 
-    <!-- 데스크탑 메뉴 (평소에는 보임) -->
-    <nav class="nav desktop-nav" aria-label="primary">
+    <!-- 데스크탑 메뉴 (≥901px) -->
+    <nav class="desktop-nav" aria-label="primary">
       <a href="mypage.html">마이페이지</a>
       <a href="offchain.html">게임</a>
     </nav>
 
-    <!-- 우측: 네트워크 + 지갑 -->
+    <!-- 우측: 네트워크 배지 + 지갑 + 햄버거 -->
     <div class="hdr-right">
       <span class="net-badge" id="netBadge">-</span>
       <button class="btn" id="btnConnect" type="button">지갑연결</button>
 
-      <!-- 모바일 햄버거 (작아지면 보임) -->
-      <button class="burger" id="btnBurger" type="button" aria-label="menu">
+      <!-- 모바일 햄버거 (≤900px에서만 보임) -->
+      <button class="burger" id="btnBurger" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="navDrawer">
         <span></span><span></span><span></span>
       </button>
     </div>
   </div>
 
-  <!-- 모바일 드로어 -->
+  <!-- 모바일 드롭다운 (헤더 바로 아래로 펼침, 화면 밀림 없음) -->
   <div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
-  <aside class="nav-drawer" id="navDrawer" aria-label="mobile menu">
-    <div class="nav-top">
-      <div class="nav-title">MENU</div>
-      <button class="nav-close" id="navClose" type="button" aria-label="close">×</button>
-    </div>
-
+  <div class="nav-drawer" id="navDrawer" role="navigation" aria-label="모바일 메뉴">
     <nav class="nav-links">
       <a href="mypage.html">마이페이지</a>
       <a href="onchain.html">온체인게임</a>
       <a href="offchain.html">오프체인게임</a>
     </nav>
-  </aside>
+  </div>
 
   <!-- 지갑 연결 후 표시되는 토큰바 -->
   <div class="hdr-tokenbar" id="hdrTokenWrap" style="display:none;">
