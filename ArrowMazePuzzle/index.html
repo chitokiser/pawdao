@@ -1,0 +1,47 @@
+<!-- /index.html -->
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Arrow Out - Neon Unravel (Lv1~30)</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <div class="app">
+    <div class="topbar">
+      <button class="iconbtn" id="btnInfo" type="button" title="설명">i</button>
+
+      <div class="centerhud">
+        <div class="hearts" id="uiHearts"></div>
+        <div class="leveltxt" id="uiLevel">Level 1</div>
+      </div>
+
+      <button class="iconbtn" id="btnGlow" type="button" title="글로우">☆</button>
+    </div>
+
+    <div class="stage">
+      <div class="boardWrap" id="board">
+        <div class="dots"></div>
+
+        <div class="mask" id="mask">
+          <canvas id="cv"></canvas>
+        </div>
+
+        <div class="toast" id="toast">화살표 머리를 클릭하면 그 방향으로 풀려 나갑니다</div>
+      </div>
+    </div>
+
+    <div class="bottombar">
+      <button id="btnPrev" type="button">이전</button>
+      <button class="primary" id="btnReset" type="button">리셋</button>
+      <button id="btnUndo" type="button">되돌리기</button>
+      <button id="btnNext" type="button">다음</button>
+      <button id="btnHearts" type="button">하트 초기화</button>
+    </div>
+  </div>
+
+  <script src="./game.js"></script>
+</body>
+</html>

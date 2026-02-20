@@ -20,7 +20,7 @@
         <ol class="ol">
           <li>지갑 연결</li>
           <li>게임 시작(joinGame)</li>
-          <li>게임 실행(바카라/테트리스)</li>
+          <li>게임 실행</li>
           <li>게임에서 END 누르면 점수+서명 저장 → 이 페이지로 복귀</li>
           <li>결과 저장(saveGame)</li>
         </ol>
@@ -96,6 +96,15 @@
         <div class="row">
           <a class="btn ghost" href="#" id="btnOpenTetris">테트리스 게임 실행</a>
           <div class="pill" id="openHintT">-</div>
+        </div>
+
+        <div class="row" style="margin-top:8px;align-items:center;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <label style="font-size:13px;">사운드:</label>
+            <input id="tetrisSfxVol" type="range" min="0" max="100" step="1" value="80" />
+            <div class="pill" id="tetrisSfxVal">80%</div>
+            <button class="btn" id="tetrisSfxMute" type="button">Mute</button>
+          </div>
         </div>
 
         <div class="note">테트리스에서 END를 누르면 점수+서명이 저장되고, 다시 이 페이지로 돌아옵니다.</div>

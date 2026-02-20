@@ -22,8 +22,28 @@
   const BASE_BALL_SPEED = 380; // px/s
   const SPEED_UP_PER_LEVEL = 1.10;
 
-  // ---- minimal SFX (WebAudio) ----
+  // ---- SFX: 실제 사운드 파일 + WebAudio tone 폴백 ----
   const SFX = (() => {
+    // sounds/ 폴더는 breakout/ 의 상위에 위치
+    const basePath = '../sounds/';
+    const masterVolume = { v: 0.85 };
+
+    // 각 이벤트별 사운드 파일 매핑
+    const samples = {
+      paddle:   '6071.mp3',                  // 패들 반사: 경쾌한 탁
+      wall:     '48183.mp3',                 // 벽 반사: 짧고 둔탁
+      brick:    'dropping-rocks-5996.mp3',   // 벽돌 파괴: 돌 떨어지는 소리
+      brickrow: 'din-ding-89718.mp3',        // 한 줄 전체 제거 보너스
+      lose:     'community-error-2-36058.mp3', // 공 낙하 (생명 감소)
+      over:     'game-over.mp3',             // 게임오버
+      win:      'levelup.mp3',               // 레벨 클리어
+      start:    '185096.mp3',                // 게임 시작
+      pause:    '185101.mp3',                // 일시정지
+      launch:   'jump.mp3',                  // 공 발사
+      resume:   'get.mp3',                   // 재개
+    };
+
+    // WebAudio 컨텍스트
     let ctxA = null;
     let master = null;
 
@@ -33,7 +53,7 @@
       if (!AudioCtx) return;
       ctxA = new AudioCtx();
       master = ctxA.createGain();
-      master.gain.value = 0.10;
+      master.gain.value = masterVolume.v;
       master.connect(ctxA.destination);
     }
 
@@ -45,6 +65,78 @@
       }catch(_e){}
     }
 
+    // WebAudio AudioBuffer 캐시 (1순위)
+    const bufferCache = {};
+    // HTMLAudio 태그 캐시 (2순위 폴백: file:// 환경)
+    const audioTagCache = {};
+
+    async function loadBuffer(key, src){
+      // 1차: fetch → decodeAudioData
+      try{
+        const resp = await fetch(src);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const arrayBuf = await resp.arrayBuffer();
+        ensure();
+        if (!ctxA) throw new Error('AudioContext 없음');
+        const decoded = await ctxA.decodeAudioData(arrayBuf);
+        bufferCache[key] = decoded;
+        console.log(`[SFX:breakout] 로드 성공: ${key}`);
+        return;
+      }catch(e){
+        console.warn(`[SFX:breakout] fetch 실패(${key}): ${e.message} → HTMLAudio 폴백`);
+      }
+      // 2차: HTMLAudio 태그
+      try{
+        const a = new Audio(src);
+        a.preload = 'auto';
+        audioTagCache[key] = a;
+        a.addEventListener('canplaythrough', () => console.log(`[SFX:breakout] HTMLAudio 성공: ${key}`), {once:true});
+        a.addEventListener('error', () => console.warn(`[SFX:breakout] HTMLAudio 실패: ${key}`), {once:true});
+      }catch(e){
+        console.warn(`[SFX:breakout] HTMLAudio 생성 실패: ${key}`, e.message);
+      }
+    }
+
+    // 프리로드
+    console.log('[SFX:breakout] basePath =', basePath);
+    Object.keys(samples).forEach(k => loadBuffer(k, basePath + samples[k]));
+
+    // WebAudio BufferSource 재생
+    function playBuffer(key, opts={}){
+      if (state.muted) return false;
+
+      // 1순위: WebAudio BufferSource
+      const buf = bufferCache[key];
+      if (buf && ctxA){
+        try{
+          const src2 = ctxA.createBufferSource();
+          src2.buffer = buf;
+          if (opts.rate) src2.playbackRate.value = opts.rate;
+          const gainNode = ctxA.createGain();
+          gainNode.gain.value = Math.max(0, Math.min(1, opts.vol || 1));
+          src2.connect(gainNode);
+          gainNode.connect(master);
+          src2.start(ctxA.currentTime);
+          return true;
+        }catch(e){ /* fallthrough */ }
+      }
+
+      // 2순위: HTMLAudio 태그
+      const a = audioTagCache[key];
+      if (a){
+        try{
+          const p = a.cloneNode(true);
+          p.volume = Math.max(0, Math.min(1, (opts.vol || 1) * masterVolume.v));
+          if (opts.rate) p.playbackRate = opts.rate;
+          p.play().catch(err => console.warn(`[SFX:breakout] play 실패: ${key}`, err.message));
+          return true;
+        }catch(e){ /* fallthrough */ }
+      }
+
+      return false;
+    }
+
+    // fallback: 오실레이터 tone
     function beep(freq, dur=0.06, type="triangle", vol=1){
       if (state.muted) return;
       ensure();
@@ -62,15 +154,71 @@
       o.stop(ctxA.currentTime + dur + 0.01);
     }
 
+    function play(key, opts={}){
+      return playBuffer(key, opts);
+    }
+
     return {
       unlock,
-      paddle(){ beep(220, 0.03, "square", 0.5); },
-      wall(){ beep(320, 0.04, "triangle", 0.6); },
-      brick(){ beep(520, 0.06, "triangle", 0.85); },
-      lose(){ [330, 262, 196].forEach((f,i)=>setTimeout(()=>beep(f,0.12,"sawtooth",0.9), i*90)); },
-      win(){ [523, 659, 784].forEach((f,i)=>setTimeout(()=>beep(f,0.10,"triangle",0.9), i*85)); },
-      start(){ [523,659].forEach((f,i)=>setTimeout(()=>beep(f,0.10,"triangle",0.85), i*70)); },
-      muteToggle(on){ if (on) beep(120, 0.10, "sine", 1); else beep(650, 0.08, "triangle", 1); }
+      setVolume(v){
+        masterVolume.v = Math.max(0, Math.min(1, v));
+        if (master) master.gain.value = masterVolume.v;
+      },
+
+      // 패들 반사: 경쾌하게
+      paddle(){ if(!play('paddle', {vol:0.75})) beep(220, 0.03, "square", 0.5); },
+
+      // 벽 반사: 살짝 다른 피치
+      wall(){ if(!play('wall', {vol:0.55})) beep(320, 0.04, "triangle", 0.6); },
+
+      // 벽돌 파괴
+      brick(row){
+        if(!play('brick', {vol:0.7 + row*0.04})) beep(520 + row*20, 0.06, "triangle", 0.85);
+      },
+
+      // 한 줄 전체 클리어 보너스
+      brickRow(){ if(!play('brickrow', {vol:0.9})) beep(660, 0.08, "triangle", 0.9); },
+
+      // 공 낙하 (생명 감소)
+      lose(){
+        if(!play('lose', {vol:1.0})){
+          [330, 262, 196].forEach((f,i)=>setTimeout(()=>beep(f,0.12,"sawtooth",0.9), i*90));
+        }
+      },
+
+      // 게임오버: 사운드 + 여운
+      over(){
+        if(!play('over', {vol:1.0})){
+          [392,330,262,196].forEach((f,i)=>setTimeout(()=>beep(f,0.12,'sawtooth',0.9), i*90));
+        }
+        setTimeout(()=> play('lose', {vol:0.35}), 700);
+      },
+
+      // 레벨 클리어
+      win(){
+        if(!play('win', {vol:1.0})){
+          [523, 659, 784].forEach((f,i)=>setTimeout(()=>beep(f,0.10,"triangle",0.9), i*85));
+        }
+        // 약간 딜레이 후 brickrow로 화려하게 마무리
+        setTimeout(()=> play('brickrow', {vol:0.6, rate:1.2}), 300);
+      },
+
+      // 공 발사
+      launch(){ if(!play('launch', {vol:0.8})) beep(440, 0.05, "sine", 0.7); },
+
+      // 게임 시작
+      start(){ if(!play('start', {vol:0.9})) beep(523, 0.09, "triangle", 0.9); },
+
+      // 일시정지
+      pause(){ if(!play('pause', {vol:0.75})) beep(200, 0.06, "sine", 0.8); },
+
+      // 재개
+      resume(){ if(!play('resume', {vol:0.8})) beep(260, 0.06, "sine", 0.8); },
+
+      muteToggle(on){
+        state.muted = !!on;
+        if(!on) play('resume', {vol:0.5});
+      }
     };
   })();
 
@@ -251,6 +399,7 @@
       if (state.lives <= 0){
         state.running = false;
         state.over = true;
+        SFX.over();
         showOverlay(true, "GAME OVER", "Space: 다시 시작 / R: 리셋");
         return;
       }
@@ -279,11 +428,13 @@
 
     // brick collisions
     let hitAny = false;
+    let hitRow = -1;
     for(const b of state.bricks){
       if(!b.alive) continue;
       if(rectHitCircle(b.x, b.y, b.w, b.h, state.bx, state.by, state.br)){
         b.alive = false;
         hitAny = true;
+        hitRow = b.r;
         state.score += BRICK_SCORE;
         // bounce: choose axis by penetration
         const cx = clamp(state.bx, b.x, b.x + b.w);
@@ -292,13 +443,21 @@
         const dy = state.by - cy;
         if (Math.abs(dx) > Math.abs(dy)) state.bvx *= -1;
         else state.bvy *= -1;
-        SFX.brick();
+        SFX.brick(b.r);  // row 정보 전달 → 위쪽 줄일수록 높은 피치
         hud();
         break;
       }
     }
 
     if(hitAny){
+      // 해당 행 전체가 클리어됐는지 확인
+      if(hitRow >= 0){
+        const rowCleared = state.bricks
+          .filter(b => b.r === hitRow)
+          .every(b => !b.alive);
+        if(rowCleared) SFX.brickRow();
+      }
+
       const remaining = state.bricks.some(b => b.alive);
       if(!remaining){
         state.level += 1;
@@ -377,13 +536,20 @@
   function togglePause(){
     if(!state.running || state.over) return;
     state.paused = !state.paused;
-    showOverlay(state.paused, "PAUSED", "P: 재개 / M: 음소거");
+    if(state.paused){
+      SFX.pause();
+      showOverlay(true, "PAUSED", "P: 재개 / M: 음소거");
+    }else{
+      SFX.resume();
+      showOverlay(false);
+    }
   }
 
   function launch(){
     if(!state.running || state.paused || state.over) return;
     if(!state.launched){
       state.launched = true;
+      SFX.launch();
     }
   }
 
@@ -519,9 +685,128 @@
     });
   }
 
-  // init
+  // ── 모바일 터치 컨트롤 ──────────────────────────────────────────
+  function setupMobileControls(){
+    // 터치 기기가 아니면 삽입 생략
+    const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    if (!isTouch) return;
+
+    // <main class="layout"> 바로 다음에 삽입 (grid 레이아웃 깨짐 방지)
+    const layoutEl = document.querySelector('main.layout');
+    const ctrl = document.createElement('div');
+    ctrl.className = 'mobile-ctrl';
+    ctrl.innerHTML = `
+      <div class="ctrl-row">
+        <button class="ctrl-btn ctrl-btn--wide" id="ctrlLeft">◀</button>
+        <button class="ctrl-btn ctrl-btn--action" id="ctrlFire">발사 / 시작</button>
+        <button class="ctrl-btn ctrl-btn--wide" id="ctrlRight">▶</button>
+      </div>
+      <div class="ctrl-row">
+        <button class="ctrl-btn ctrl-btn--sm" id="ctrlPause">⏸ P</button>
+        <button class="ctrl-btn ctrl-btn--sm" id="ctrlReset">↺ R</button>
+        <button class="ctrl-btn ctrl-btn--sm" id="ctrlMute">🔊 M</button>
+      </div>
+    `;
+    if (layoutEl && layoutEl.parentNode){
+      layoutEl.parentNode.insertBefore(ctrl, layoutEl.nextSibling);
+    } else {
+      document.querySelector('.app')?.appendChild(ctrl);
+    }
+
+    // 좌/우 버튼: touchstart/touchend 로 연속 이동
+    function bindDir(id, dirKey){
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.addEventListener('touchstart', async (e) => {
+        e.preventDefault();
+        await SFX.unlock();
+        keys[dirKey] = true;
+      }, { passive: false });
+      btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys[dirKey] = false;
+      }, { passive: false });
+      btn.addEventListener('touchcancel', () => { keys[dirKey] = false; });
+    }
+    bindDir('ctrlLeft',  'left');
+    bindDir('ctrlRight', 'right');
+
+    // 발사 / 시작 버튼
+    const firBtn = document.getElementById('ctrlFire');
+    if (firBtn){
+      firBtn.addEventListener('touchstart', async (e) => {
+        e.preventDefault();
+        await SFX.unlock();
+        if (!state.running || state.over) startGame();
+        else launch();
+      }, { passive: false });
+    }
+
+    // 일시정지
+    const pauseBtn = document.getElementById('ctrlPause');
+    if (pauseBtn){
+      pauseBtn.addEventListener('touchstart', async (e) => {
+        e.preventDefault();
+        await SFX.unlock();
+        togglePause();
+      }, { passive: false });
+    }
+
+    // 리셋
+    const resetBtn = document.getElementById('ctrlReset');
+    if (resetBtn){
+      resetBtn.addEventListener('touchstart', async (e) => {
+        e.preventDefault();
+        await SFX.unlock();
+        resetAll();
+      }, { passive: false });
+    }
+
+    // 음소거
+    const muteBtn = document.getElementById('ctrlMute');
+    if (muteBtn){
+      muteBtn.addEventListener('touchstart', async (e) => {
+        e.preventDefault();
+        await SFX.unlock();
+        state.muted = !state.muted;
+        SFX.muteToggle(state.muted);
+        muteBtn.textContent = (state.muted ? '🔇' : '🔊') + ' M';
+      }, { passive: false });
+    }
+
+    // 캔버스 터치 스와이프 → 패들 직접 이동
+    let touchStartX = null;
+    cv.addEventListener('touchstart', async (e) => {
+      e.preventDefault();
+      await SFX.unlock();
+      touchStartX = e.touches[0].clientX;
+      // 발사 안 됐으면 발사
+      if (state.running && !state.paused && !state.over && !state.launched){
+        state.launched = true;
+        SFX.launch();
+      }
+    }, { passive: false });
+
+    cv.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (touchStartX === null) return;
+      const rect = cv.getBoundingClientRect();
+      const scaleX = W / rect.width;
+      const tx = (e.touches[0].clientX - rect.left) * scaleX;
+      state.px = clamp(tx, state.pw/2 + 8, W - state.pw/2 - 8);
+      touchStartX = e.touches[0].clientX;
+    }, { passive: false });
+
+    cv.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      touchStartX = null;
+    }, { passive: false });
+  }
+
+  // ── 초기화 ─────────────────────────────────────────────────────
   makeBricks();
   resetAll();
   setupEndButton();
+  setupMobileControls();
   requestAnimationFrame(loop);
 })();

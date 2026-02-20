@@ -10,12 +10,11 @@
   --ok:#2ee59d;
   --warn:#ffd166;
   --danger:#ff4d6d;
-
   --radius:16px;
 }
 
 *{ box-sizing:border-box; }
-html,body{ height:100%; }
+html,body{ height:100%; overflow-x:hidden; }
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
@@ -23,28 +22,28 @@ body{
               radial-gradient(1000px 600px at 95% 10%, rgba(255,209,102,.12), transparent 55%),
               var(--bg);
   color:var(--text);
+  touch-action: pan-y;
 }
 
 .app{
   max-width: 980px;
   margin: 0 auto;
-  padding: 18px 16px 28px;
+  padding: 12px 12px 24px;
 }
 
+/* ── 헤더 ── */
 .top{
   display:flex;
-  align-items:flex-end;
+  align-items:center;
   justify-content:space-between;
-  gap: 14px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
-
 .brand{
-  font-size: 28px;
+  font-size: 24px;
   letter-spacing: 1px;
   font-weight: 800;
 }
-
 .hint{
   font-size: 12px;
   color: var(--muted);
@@ -52,59 +51,62 @@ body{
   text-align:right;
 }
 
+/* ── 메인 레이아웃 ── */
 .layout{
   display:grid;
-  grid-template-columns: 1fr 280px;
-  gap: 14px;
+  grid-template-columns: 1fr 260px;
+  gap: 12px;
 }
 
+/* ── 캔버스 영역 ── */
 .board-wrap{
   position:relative;
   background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
   border: 1px solid var(--line);
   border-radius: var(--radius);
   overflow:hidden;
-  padding: 12px;
+  padding: 10px;
 }
 
 #board{
   width: 100%;
-  max-width: 520px;
+  max-width: 420px;
   height: auto;
   display:block;
   margin: 0 auto;
   background: rgba(0,0,0,.25);
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid var(--line2);
+  touch-action: none;
 }
 
+/* ── 사이드 ── */
 .side{
   display:flex;
   flex-direction:column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .panel{
   background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 12px;
+  padding: 10px 12px;
 }
-
-.panel--small{ padding: 12px 12px 10px; }
+.panel--small{ padding: 10px 12px 8px; }
 
 .panel-title{
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: .9px;
   color: var(--muted);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 #next, #hold{
   width: 100%;
   height: auto;
   background: rgba(0,0,0,.22);
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid var(--line2);
   display:block;
 }
@@ -112,42 +114,43 @@ body{
 .stats{
   display:grid;
   grid-template-columns: 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 .stat{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid var(--line2);
-  border-radius: 12px;
+  border-radius: 10px;
   background: rgba(0,0,0,.16);
 }
 .stat .k{
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
   letter-spacing: .6px;
 }
 .stat .v{
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
 }
 
 .list{
   margin: 0;
-  padding-left: 18px;
+  padding-left: 16px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.55;
 }
 
 .foot{
-  margin-top: 14px;
+  margin-top: 12px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11px;
   text-align:center;
 }
 
+/* ── 오버레이 ── */
 .overlay{
   position:absolute;
   inset:0;
@@ -156,16 +159,16 @@ body{
   justify-content:center;
   background: rgba(0,0,0,.55);
   backdrop-filter: blur(6px);
-  padding: 16px;
+  padding: 14px;
 }
 .overlay.hidden{ display:none; }
 
 .overlay-card{
-  width: min(420px, 100%);
+  width: min(380px, 100%);
   border-radius: 18px;
   border: 1px solid var(--line);
   background: rgba(18,24,37,.92);
-  padding: 16px;
+  padding: 18px 16px;
   box-shadow: 0 12px 40px rgba(0,0,0,.35);
   text-align:center;
 }
@@ -176,11 +179,10 @@ body{
 }
 .overlay-desc{
   margin-top: 6px;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
   line-height: 1.5;
 }
-
 .overlay-actions{
   display:flex;
   gap: 10px;
@@ -188,23 +190,147 @@ body{
   margin-top: 14px;
 }
 
+/* ── 버튼 ── */
 .btn{
   appearance:none;
   border: 1px solid rgba(255,255,255,.18);
   background: rgba(46,229,157,.18);
   color: var(--text);
-  padding: 10px 14px;
+  padding: 10px 16px;
   border-radius: 14px;
   cursor:pointer;
   font-weight: 800;
+  font-size: 14px;
+  min-height: 44px;
+  min-width: 80px;
 }
 .btn:hover{ filter: brightness(1.08); }
+.btn:active{ transform: translateY(1px); opacity:.85; }
 .btn--ghost{
   background: rgba(255,255,255,.06);
 }
 
+/* ══════════════════════════════════════════
+   모바일 터치 컨트롤 패드
+   JS가 터치 기기 감지 시 .app 안에 삽입 + data-touch 속성으로 표시
+══════════════════════════════════════════ */
+.mobile-ctrl{
+  /* JS 삽입 전까지 숨김; JS가 터치 기기에서만 삽입하므로 기본 flex */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  /* 데스크톱에서 마우스만 있는 경우를 위한 추가 가드는 JS에서 처리 */
+}
+
+.ctrl-row{
+  display:flex;
+  gap: 6px;
+  justify-content:center;
+  align-items:stretch;
+}
+
+.ctrl-btn{
+  appearance:none;
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.16);
+  color: var(--text);
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 900;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.07s, transform 0.05s;
+}
+.ctrl-btn:active{
+  background: rgba(255,255,255,.22);
+  transform: scale(.92);
+}
+
+/* 이동 버튼 (좌/우) */
+.ctrl-btn--move{
+  width: 72px;
+  height: 54px;
+}
+/* 회전 버튼 */
+.ctrl-btn--rot{
+  width: 60px;
+  height: 54px;
+  font-size: 18px;
+}
+/* 액션 버튼 (하드드롭/소프트드롭) */
+.ctrl-btn--drop{
+  flex: 1;
+  height: 54px;
+  font-size: 14px;
+  background: rgba(46,229,157,.15);
+  border-color: rgba(46,229,157,.28);
+}
+.ctrl-btn--soft{
+  flex: 1;
+  height: 46px;
+  font-size: 13px;
+  background: rgba(77,171,255,.13);
+  border-color: rgba(77,171,255,.25);
+}
+/* 홀드/유틸 버튼 */
+.ctrl-btn--sm{
+  width: 56px;
+  height: 46px;
+  font-size: 12px;
+}
+
+/* ══════════════════════════════════════════
+   반응형 미디어 쿼리
+══════════════════════════════════════════ */
+
+/* 태블릿: 사이드 아래로 */
 @media (max-width: 860px){
   .layout{ grid-template-columns: 1fr; }
-  .hint{ text-align:left; }
-  #board{ max-width: 520px; }
+  .side{
+    order: 2;
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  /* NEXT/HOLD/STATS 3열로 */
+  .panel--small{ grid-column: 1 / -1; }
+  .stats{ grid-template-columns: repeat(3,1fr); }
+  .stat{ flex-direction:column; align-items:center; }
+}
+
+/* 모바일 */
+@media (max-width: 540px){
+  .app{ padding: 8px 8px 16px; }
+
+  .brand{ font-size: 20px; }
+  .hint{ display:none; }
+
+  .board-wrap{ padding: 6px; }
+  #board{ max-width: 100%; border-radius: 8px; }
+
+  .layout{ gap: 8px; }
+  .side{ grid-template-columns: 1fr 1fr; }
+  /* CONTROLS 패널 숨김 (모바일 버튼으로 대체) */
+  .side .panel--small:last-child{ display:none; }
+
+  .stats{ grid-template-columns: repeat(3,1fr); }
+  .stat{ padding: 6px 4px; }
+  .stat .v{ font-size: 15px; }
+
+  .overlay-title{ font-size: 18px; }
+  .overlay-desc{ font-size: 11px; }
+  .btn{ min-height: 46px; }
+}
+
+/* 소형 모바일 */
+@media (max-width: 360px){
+  .ctrl-btn--move{ width: 62px; height: 48px; font-size: 18px; }
+  .ctrl-btn--drop{ height: 48px; font-size: 12px; }
+  .ctrl-btn--soft{ height: 42px; font-size: 11px; }
+  .ctrl-btn--sm{ width: 50px; height: 42px; }
 }

@@ -275,6 +275,37 @@
 
       loadScoreToUI(gid);
     }
+
+    // Tetris sound controls (store settings in localStorage so tetris window can pick up)
+    const volEl = $("tetrisSfxVol");
+    const valEl = $("tetrisSfxVal");
+    const muteBtn = $("tetrisSfxMute");
+    if(volEl && valEl){
+      const keyVol = 'paw_tetris_sfx_volume';
+      const keyMute = 'paw_tetris_sfx_muted';
+      const stored = localStorage.getItem(keyVol);
+      const init = stored !== null ? Number(stored) : 0.8;
+      const percent = Math.round((init || 0.8) * 100);
+      volEl.value = percent;
+      valEl.textContent = percent + '%';
+
+      volEl.addEventListener('input', () => {
+        const p = Number(volEl.value || 80);
+        valEl.textContent = p + '%';
+        const v = Math.max(0, Math.min(1, p/100));
+        localStorage.setItem(keyVol, String(v));
+      });
+
+      // mute
+      const storedMute = localStorage.getItem(keyMute) === '1';
+      muteBtn.textContent = storedMute ? 'Unmute' : 'Mute';
+      muteBtn.addEventListener('click', () => {
+        const cur = localStorage.getItem(keyMute) === '1';
+        const next = cur ? '0' : '1';
+        localStorage.setItem(keyMute, next);
+        muteBtn.textContent = next === '1' ? 'Unmute' : 'Mute';
+      });
+    }
   }
 
   // init

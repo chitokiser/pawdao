@@ -27,13 +27,18 @@
           <div class="kv"><div class="k">1회배당금액</div><div class="v" id="uPower">-</div></div>
           <div class="kv"><div class="k">champion</div><div class="v" id="uChampion">-</div></div>
 
-          <div class="kv"><div class="k">pending</div><div class="v" id="uPending">-</div></div>
-          <div class="kv"><div class="k">pendingAt</div><div class="v" id="uPendingAt">-</div></div>
+          <div class="kv"><div class="k">pending <button type="button" class="helpBtn" data-help="pending" style="margin-left:8px;padding:2px 6px;border-radius:6px;">?</button></div><div class="v" id="uPending">-</div></div>
+          <div class="kv" style="position:relative;">
+            <div class="k">pendingAt <button type="button" class="helpBtn" data-help="pendingAt" style="margin-left:8px;padding:2px 6px;border-radius:6px;">?</button></div>
+            <div class="v">
+              <span id="uPendingAt">-</span>
+            </div>
+          </div>
 
-          <div class="kv"><div class="k">numerator</div><div class="v" id="uNum">-</div></div>
-          <div class="kv"><div class="k">denominator</div><div class="v" id="uDen">-</div></div>
+          <div class="kv"><div class="k">numerator <button type="button" class="helpBtn" data-help="numerator" style="margin-left:8px;padding:2px 6px;border-radius:6px;">?</button></div><div class="v" id="uNum">-</div></div>
+          <div class="kv"><div class="k">denominator <button type="button" class="helpBtn" data-help="denominator" style="margin-left:8px;padding:2px 6px;border-radius:6px;">?</button></div><div class="v" id="uDen">-</div></div>
 
-          <div class="kv"><div class="k">pendingTimeout</div><div class="v" id="cTimeout">-</div></div>
+          <div class="kv"><div class="k">pendingTimeout <button type="button" class="helpBtn" data-help="timeout" style="margin-left:8px;padding:2px 6px;border-radius:6px;">?</button></div><div class="v" id="cTimeout">-</div></div>
         </div>
 
         <div class="note">지갑 연결 시 자동으로 갱신됩니다.</div>
@@ -52,7 +57,8 @@
         <div class="card-h">배당 청구</div>
         <div class="row">
           <button class="btn" id="btnClaim" type="button">Claim</button>
-          <div class="pill" id="claimHint">-</div>
+          <div class="pill" id="claimHint">내 1회 배당금</div>
+          <div class="pill" id="nextClaim">다음배당까지남은시간</div>
         </div>
         <div class="note">claim은 24시간마다 가능합니다.</div>
       </section>
@@ -70,6 +76,15 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.14.0/dist/ethers.umd.min.js"></script>
+  <!-- Pending info modal -->
+  <div id="pendingModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1200;"></div>
+  <div id="pendingModal" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1201;max-width:520px;width:90%;background:#fff;border-radius:8px;padding:16px;box-shadow:0 8px 40px rgba(0,0,0,0.2);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="font-weight:700;font-size:16px">pending 상태 정보</div>
+      <button id="pendingModalClose" style="border:0;background:#eee;padding:4px 8px;border-radius:6px;cursor:pointer">닫기</button>
+    </div>
+    <div id="pendingModalContent" style="color:#222;font-size:14px;line-height:1.4"></div>
+  </div>
 
   <script src="assets/js/config.js"></script>
   <script src="assets/js/wallet.js"></script>

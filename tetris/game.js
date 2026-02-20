@@ -137,75 +137,264 @@
     return g;
   }
 
-  // Sound (WebAudio 간단)
+  // Sound: prefer playing sampled audio files from /sounds, fallback to simple WebAudio tones
   const SFX = (() => {
-    let ctxA = null;
-    let master = null;
+    // sounds/ 폴더는 항상 tetris/ 의 상위(루트)에 위치
+    // file:///.../tetris/index.html  → ../sounds/
+    // http://localhost/.../tetris/   → ../sounds/
+    const basePath = '../sounds/';
+    const masterVolume = { v: 0.8 };
 
-    function ensure(){
+    // 각 이벤트별 최적 사운드 파일 매핑
+    // move     : 블럭 좌우 이동
+    // rotate   : 블럭 회전
+    // fall     : 블럭이 자동으로 내려올 때(soft drop)
+    // hard     : 하드드롭(스페이스)
+    // lock     : 블럭이 바닥/다른 블럭에 닿아 고정
+    // clear1~4 : 1~4줄 동시 클리어 (줄 수 많을수록 화려한 사운드)
+    // score    : 점수 획득 (줄 클리어 외 하드드롭 보너스 등)
+    // hold     : 홀드
+    // over     : 게임오버
+    // start    : 게임 시작
+    // pause    : 일시정지
+    // resume   : 재개
+    const samples = {
+      move:   '6071.mp3',              // 짧고 경쾌한 이동음
+      rotate: '48183.mp3',             // 회전음
+      fall:   'bricks-fall-315300.mp3',// 블럭 낙하 느낌
+      hard:   'crush.mp3',             // 하드드롭 충격음
+      lock:   'dropping-rocks-5996.mp3',// 고정 둔탁음
+      clear1: 'din-ding-89718.mp3',    // 1줄 클리어: 경쾌한 딩
+      clear2: '102844.mp3',            // 2줄 클리어
+      clear3: 'reward.mp3',            // 3줄 클리어: 보상음
+      clear4: 'levelup.mp3',           // 4줄(테트리스): 레벨업
+      score:  'din-ding-89718.mp3',    // 점수 획득 알림
+      hold:   'get.mp3',               // 홀드
+      over:   'game-over.mp3',         // 게임오버
+      start:  '185096.mp3',            // 게임 시작
+      pause:  '185101.mp3',            // 일시정지
+      resume: 'get.mp3',               // 재개
+    };
+
+    // WebAudio 컨텍스트 (fallback tone + AudioBuffer 재생 공용)
+    let ctxA = null; let masterGain = null;
+    function ensureCtx(){
       if (ctxA) return;
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
       ctxA = new AudioCtx();
-      master = ctxA.createGain();
-      master.gain.value = 0.12;
-      master.connect(ctxA.destination);
+      masterGain = ctxA.createGain();
+      masterGain.gain.value = masterVolume.v;
+      masterGain.connect(ctxA.destination);
     }
-
     async function unlock(){
       try{
-        ensure();
-        if (!ctxA) return;
-        if (ctxA.state === "suspended") await ctxA.resume();
-      }catch(_e){}
+        ensureCtx();
+        if (ctxA && ctxA.state === 'suspended') await ctxA.resume();
+      }catch(e){}
     }
 
-    function tone(freq, dur=0.05, type="sine", vol=1){
+    // AudioBuffer 캐시: fetch → decodeAudioData 방식
+    // file:// 프로토콜에서도 Audio 태그보다 안정적으로 동작
+    const bufferCache = {};
+
+    // HTMLAudio 캐시: fetch가 file:// 에서 막힐 경우의 2차 폴백
+    const audioTagCache = {};
+
+    async function loadBuffer(key, src){
+      // 1차: fetch → WebAudio decodeAudioData (http/https 환경에 최적)
+      try{
+        const resp = await fetch(src);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const arrayBuf = await resp.arrayBuffer();
+        ensureCtx();
+        if (!ctxA) throw new Error('AudioContext 없음');
+        const decoded = await ctxA.decodeAudioData(arrayBuf);
+        bufferCache[key] = decoded;
+        console.log(`[SFX] WebAudio 로드 성공: ${key}`);
+        return;
+      }catch(e){
+        console.warn(`[SFX] fetch 실패(${key}): ${e.message} → HTMLAudio 폴백`);
+      }
+      // 2차: HTMLAudio 태그 (file:// 프로토콜 등)
+      try{
+        const a = new Audio(src);
+        a.preload = 'auto';
+        audioTagCache[key] = a;
+        a.addEventListener('canplaythrough', () => console.log(`[SFX] HTMLAudio 로드 성공: ${key}`), {once:true});
+        a.addEventListener('error', () => console.warn(`[SFX] HTMLAudio 로드 실패: ${key} → ${src}`), {once:true});
+      }catch(e){
+        console.warn(`[SFX] HTMLAudio 생성 실패: ${key}`, e.message);
+      }
+    }
+
+    // 모든 사운드 파일 비동기 프리로드
+    console.log('[SFX] basePath =', basePath);
+    Object.keys(samples).forEach(k => {
+      loadBuffer(k, basePath + samples[k]);
+    });
+
+    // WebAudio BufferSource 재생 (1순위)
+    function playBuffer(key, opts={}){
+      if (state.muted) return false;
+
+      // 1순위: WebAudio BufferSource
+      const buf = bufferCache[key];
+      if (buf && ctxA){
+        try{
+          const src2 = ctxA.createBufferSource();
+          src2.buffer = buf;
+          if (opts.rate) src2.playbackRate.value = opts.rate;
+          const gainNode = ctxA.createGain();
+          gainNode.gain.value = Math.max(0, Math.min(1, (opts.vol||1)));
+          src2.connect(gainNode);
+          gainNode.connect(masterGain);
+          src2.start(ctxA.currentTime);
+          return true;
+        }catch(e){ /* fallthrough */ }
+      }
+
+      // 2순위: HTMLAudio 태그
+      const a = audioTagCache[key];
+      if (a){
+        try{
+          const p = a.cloneNode(true);
+          p.volume = Math.max(0, Math.min(1, (opts.vol||1) * masterVolume.v));
+          if (opts.rate) p.playbackRate = opts.rate;
+          p.play().catch(err => console.warn(`[SFX] HTMLAudio play 실패: ${key}`, err.message));
+          return true;
+        }catch(e){ /* fallthrough */ }
+      }
+
+      return false;
+    }
+
+    // fallback 단순 오실레이터 tone
+    function tone(freq, dur=0.05, type='sine', vol=1){
       if (state.muted) return;
-      ensure();
-      if (!ctxA || !master) return;
-
-      const o = ctxA.createOscillator();
-      const g = ctxA.createGain();
-      o.type = type;
-      o.frequency.setValueAtTime(freq, ctxA.currentTime);
-
+      ensureCtx(); if (!ctxA) return;
+      const o = ctxA.createOscillator(); const g = ctxA.createGain();
+      o.type = type; o.frequency.setValueAtTime(freq, ctxA.currentTime);
       g.gain.setValueAtTime(0.0001, ctxA.currentTime);
       g.gain.exponentialRampToValueAtTime(0.12 * vol, ctxA.currentTime + 0.005);
       g.gain.exponentialRampToValueAtTime(0.0001, ctxA.currentTime + dur);
-
-      o.connect(g);
-      g.connect(master);
-
-      o.start(ctxA.currentTime);
-      o.stop(ctxA.currentTime + dur + 0.01);
+      o.connect(g); g.connect(masterGain);
+      o.start(ctxA.currentTime); o.stop(ctxA.currentTime + dur + 0.01);
     }
 
-    function chord(freqs, dur=0.08, type="triangle", vol=1){
-      freqs.forEach((f, i) => setTimeout(() => tone(f, dur, type, vol), i*8));
+    // playSample: bufferCache 우선, 없으면 false 반환 → 호출부에서 tone() fallback
+    function playSample(key, opts={}){
+      if (state.muted) return false;
+      return playBuffer(key, opts);
+    }
+
+    // 여러 사운드를 딜레이를 두고 순서대로 재생
+    function playSequence(keys, delayMs=80){
+      keys.forEach((k, i) => {
+        if (Array.isArray(k)){
+          const [key, opts] = k;
+          setTimeout(() => playSample(key, opts), i * delayMs);
+        } else {
+          setTimeout(() => playSample(k), i * delayMs);
+        }
+      });
     }
 
     return {
       unlock,
-      move(){ tone(220, 0.03, "square", 0.55); },
-      rotate(){ tone(330, 0.04, "triangle", 0.65); },
-      soft(){ tone(180, 0.02, "square", 0.35); },
-      hard(){ chord([440, 660], 0.06, "triangle", 0.85); },
-      lock(){ tone(140, 0.05, "sawtooth", 0.6); },
-      clear(lines){
-        if(lines === 1) chord([440, 550], 0.07, "triangle", 0.9);
-        else if(lines === 2) chord([440, 660, 880], 0.08, "triangle", 0.95);
-        else if(lines === 3) chord([392, 523, 659, 988], 0.09, "triangle", 1.0);
-        else chord([330, 440, 660, 880, 1100], 0.10, "triangle", 1.1);
+      setVolume(v){
+        masterVolume.v = Math.max(0, Math.min(1, v));
+        if (masterGain) masterGain.gain.value = masterVolume.v;
       },
-      hold(){ chord([262, 330], 0.06, "sine", 0.7); },
-      over(){ [392, 330, 262, 196].forEach((f,i)=>setTimeout(()=>tone(f,0.12,"sawtooth",0.9), i*90)); },
-      start(){ chord([523, 659], 0.09, "triangle", 0.9); },
-      pause(){ tone(200, 0.06, "sine", 0.8); },
-      resume(){ tone(260, 0.06, "sine", 0.8); },
-      muteToggle(on){ if (on) tone(120, 0.09, "sine", 1.0); else tone(520, 0.08, "triangle", 1.0); }
+
+      // 블럭 좌우 이동
+      move(){ if(!playSample('move', {vol:0.7})) tone(220,0.03,'square',0.55); },
+
+      // 블럭 회전
+      rotate(){ if(!playSample('rotate', {vol:0.75})) tone(330,0.04,'triangle',0.65); },
+
+      // 블럭 자동 낙하 / 소프트드롭 (내려올 때)
+      fall(){ if(!playSample('fall', {vol:0.35})) tone(180,0.02,'square',0.35); },
+
+      // 하드드롭 (스페이스: 강하게 떨어짐)
+      hard(){ if(!playSample('hard', {vol:1.0})) tone(440,0.06,'triangle',0.85); },
+
+      // 블럭 고정 (바닥/다른 블럭에 닿아 lock)
+      lock(){ if(!playSample('lock', {vol:0.85})) tone(140,0.05,'sawtooth',0.6); },
+
+      // 줄 클리어 (줄 수에 따라 사운드 구분, 4줄은 추가 보상음)
+      clear(lines){
+        if (lines === 1){
+          if(!playSample('clear1', {vol:0.85})) tone(440,0.07,'triangle',0.9);
+        } else if (lines === 2){
+          if(!playSample('clear2', {vol:0.9})) tone(523,0.08,'triangle',0.95);
+        } else if (lines === 3){
+          if(!playSample('clear3', {vol:0.95})) tone(587,0.09,'triangle',1.0);
+        } else {
+          // 테트리스(4줄): clear4 재생 후 짧은 딜레이로 score도 재생해 화려하게
+          if(!playSample('clear4', {vol:1.0})) tone(659,0.10,'triangle',1.1);
+          setTimeout(()=> playSample('score', {vol:0.6, rate:1.3}), 350);
+        }
+      },
+
+      // 점수 획득 (하드드롭 보너스 등 줄클리어 외 점수)
+      score(){ playSample('score', {vol:0.5, rate:1.1}); },
+
+      // 홀드
+      hold(){ if(!playSample('hold', {vol:0.8})) tone(262,0.06,'sine',0.7); },
+
+      // 게임오버: game-over 재생 + 낙하 사운드 딜레이 연출
+      over(){
+        if(!playSample('over', {vol:1.0})){
+          [392,330,262,196].forEach((f,i)=>setTimeout(()=>tone(f,0.12,'sawtooth',0.9), i*90));
+        }
+        // 추가 강조: 잠시 후 lock 사운드 여운
+        setTimeout(()=> playSample('lock', {vol:0.4}), 600);
+      },
+
+      // 게임 시작
+      start(){
+        if(!playSample('start', {vol:0.9})) tone(523,0.09,'triangle',0.9);
+      },
+
+      // 일시정지
+      pause(){ if(!playSample('pause', {vol:0.75})) tone(200,0.06,'sine',0.8); },
+
+      // 재개
+      resume(){ if(!playSample('resume', {vol:0.8})) tone(260,0.06,'sine',0.8); },
+
+      muteToggle(on){ state.muted = !!on; if(!on) { playSample('score', {vol:0.5}); } }
     };
   })();
+
+  // Apply persisted sound settings (volume / mute) from localStorage and listen for changes
+  try{
+    const VOL_KEY = 'paw_tetris_sfx_volume';
+    const MUTE_KEY = 'paw_tetris_sfx_muted';
+    const vRaw = localStorage.getItem(VOL_KEY);
+    if (vRaw !== null) {
+      const v = Number(vRaw);
+      if (!Number.isNaN(v) && typeof SFX.setVolume === 'function') SFX.setVolume(v);
+    }
+    const mRaw = localStorage.getItem(MUTE_KEY);
+    if (mRaw !== null) {
+      const m = mRaw === '1';
+      if (typeof SFX.muteToggle === 'function') SFX.muteToggle(m);
+    }
+
+    window.addEventListener('storage', (e) => {
+      try{
+        if (!e.key) return;
+        if (e.key === VOL_KEY) {
+          const nv = Number(e.newValue || 0.8);
+          if (!Number.isNaN(nv) && typeof SFX.setVolume === 'function') SFX.setVolume(nv);
+        } else if (e.key === MUTE_KEY) {
+          const nm = e.newValue === '1';
+          if (typeof SFX.muteToggle === 'function') SFX.muteToggle(nm);
+        }
+      }catch(_){ }
+    });
+  }catch(_){ }
 
   // 점수는 기존의 1/10 단위
   const LINE_SCORE = [0, 10, 30, 50, 80];
@@ -451,12 +640,14 @@
     spawn();
   }
 
-  function softDrop(){
+  // silent=true: 자동 낙하 (루프에서 호출) - 사운드 없음
+  // silent=false: 플레이어가 아래 키를 눌러 소프트드롭 - 낙하 사운드 재생
+  function softDrop(silent=false){
     if(!state.running || state.paused || state.over) return;
     const cand = { ...state.cur, y: state.cur.y + 1 };
     if(!collides(state.board, cand)){
       state.cur.y++;
-      SFX.soft();
+      if(!silent) SFX.fall();
     }else{
       lockPiece();
     }
@@ -470,6 +661,7 @@
 
     const dist = Math.max(0, state.cur.y - beforeY);
     addScore(dist);
+    if (dist > 0) SFX.score();  // 하드드롭 보너스 점수 획득 알림
 
     SFX.hard();
     lockPiece();
@@ -566,7 +758,7 @@
     if(state.running && !state.paused && !state.over){
       state.dropCounter += delta;
       if(state.dropCounter > state.dropInterval){
-        softDrop();
+        softDrop(true);  // 자동 낙하: 사운드 없음
         state.dropCounter = 0;
       }
     }
@@ -726,7 +918,142 @@
   btnStart.addEventListener("click", async () => { await SFX.unlock(); startGame(); });
   btnReset.addEventListener("click", async () => { await SFX.unlock(); resetAll(); });
 
+  // ── 모바일 터치 컨트롤 ──────────────────────────────────────────
+  function setupMobileControls(){
+    const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    if (!isTouch) return;
+
+    // 컨트롤 컨테이너를 <main class="layout"> 바로 다음에 삽입
+    // (.layout 안에 넣으면 grid 레이아웃을 깨므로 반드시 바깥에)
+    const layoutEl = document.querySelector('main.layout');
+    const ctrl = document.createElement('div');
+    ctrl.className = 'mobile-ctrl';
+    // 행 1: 좌/우 이동 + 회전(반시계/시계)
+    // 행 2: 소프트드롭 / 하드드롭 / 홀드
+    // 행 3: 유틸 (시작, 일시정지, 리셋, 음소거)
+    ctrl.innerHTML = `
+      <div class="ctrl-row">
+        <button class="ctrl-btn ctrl-btn--move" id="tctrlLeft">◀</button>
+        <button class="ctrl-btn ctrl-btn--rot"  id="tctrlRotCCW">↺</button>
+        <button class="ctrl-btn ctrl-btn--rot"  id="tctrlRotCW">↻</button>
+        <button class="ctrl-btn ctrl-btn--move" id="tctrlRight">▶</button>
+      </div>
+      <div class="ctrl-row">
+        <button class="ctrl-btn ctrl-btn--soft" id="tctrlSoft">▼ 소프트</button>
+        <button class="ctrl-btn ctrl-btn--drop" id="tctrlHard">⬇ 하드드롭</button>
+        <button class="ctrl-btn ctrl-btn--sm"   id="tctrlHold">📦 홀드</button>
+      </div>
+      <div class="ctrl-row">
+        <button class="ctrl-btn ctrl-btn--sm"   id="tctrlStart">▶ 시작</button>
+        <button class="ctrl-btn ctrl-btn--sm"   id="tctrlPause">⏸ P</button>
+        <button class="ctrl-btn ctrl-btn--sm"   id="tctrlReset">↺ R</button>
+        <button class="ctrl-btn ctrl-btn--sm"   id="tctrlMute">🔊 M</button>
+      </div>
+    `;
+    if (layoutEl && layoutEl.parentNode){
+      layoutEl.parentNode.insertBefore(ctrl, layoutEl.nextSibling);
+    } else {
+      document.querySelector('.app')?.appendChild(ctrl);
+    }
+
+    // 유틸: touchstart → 1회 실행
+    function bindTap(id, fn){
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('touchstart', async (e) => {
+        e.preventDefault();
+        await SFX.unlock();
+        fn();
+      }, { passive: false });
+    }
+
+    // 좌/우: 누르는 동안 연속 이동 (DAS: Delayed Auto Shift 간이 구현)
+    function bindDAS(id, fn){
+      const el = document.getElementById(id);
+      if (!el) return;
+      let timer = null;
+      el.addEventListener('touchstart', async (e) => {
+        e.preventDefault();
+        await SFX.unlock();
+        fn();                                        // 즉시 1회
+        timer = setInterval(fn, 110);               // 110ms 마다 반복
+      }, { passive: false });
+      const stop = () => { clearInterval(timer); timer = null; };
+      el.addEventListener('touchend',   stop);
+      el.addEventListener('touchcancel', stop);
+    }
+
+    bindDAS('tctrlLeft',  () => move(-1));
+    bindDAS('tctrlRight', () => move(1));
+    bindTap('tctrlRotCW',  () => rotate('CW'));
+    bindTap('tctrlRotCCW', () => rotate('CCW'));
+    bindDAS('tctrlSoft',  () => softDrop(false));
+    bindTap('tctrlHard',  () => hardDrop());
+    bindTap('tctrlHold',  () => hold());
+    bindTap('tctrlStart', () => {
+      if (!state.running || state.over) startGame();
+      else if (state.paused) togglePause();
+    });
+    bindTap('tctrlPause', () => togglePause());
+    bindTap('tctrlReset', () => resetAll());
+    bindTap('tctrlMute',  () => {
+      state.muted = !state.muted;
+      SFX.muteToggle(state.muted);
+      const btn = document.getElementById('tctrlMute');
+      if (btn) btn.textContent = (state.muted ? '🔇' : '🔊') + ' M';
+    });
+
+    // ── 캔버스 스와이프 제스처 ─────────────────────────────────
+    // 좌/우 스와이프 → 이동, 위 스와이프 → 회전, 아래 스와이프 → 소프트드롭
+    // 짧은 탭(이동 없음) → 회전
+    let swX = null, swY = null, swT = null;
+    const SWIPE_MIN  = 28;   // px: 스와이프 인식 최소 거리
+    const TAP_MAX_MS = 200;  // ms: 탭 인식 최대 시간
+    const TAP_MAX_PX = 10;   // px: 탭 인식 최대 이동
+
+    boardCanvas.addEventListener('touchstart', async (e) => {
+      e.preventDefault();
+      await SFX.unlock();
+      swX = e.touches[0].clientX;
+      swY = e.touches[0].clientY;
+      swT = Date.now();
+      // 시작 중이 아니면 시작
+      if (!state.running || state.over) startGame();
+    }, { passive: false });
+
+    boardCanvas.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      if (swX === null) return;
+      const dx = e.changedTouches[0].clientX - swX;
+      const dy = e.changedTouches[0].clientY - swY;
+      const dt = Date.now() - swT;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist < TAP_MAX_PX && dt < TAP_MAX_MS){
+        // 탭 → 시계 회전
+        rotate('CW');
+      } else if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_MIN){
+        // 좌/우 스와이프 → 이동
+        move(dx > 0 ? 1 : -1);
+      } else if (dy < -SWIPE_MIN){
+        // 위 스와이프 → 하드드롭
+        hardDrop();
+      } else if (dy > SWIPE_MIN){
+        // 아래 스와이프 → 소프트드롭
+        softDrop(false);
+      }
+
+      swX = null; swY = null; swT = null;
+    }, { passive: false });
+
+    boardCanvas.addEventListener('touchcancel', () => {
+      swX = null; swY = null; swT = null;
+    });
+  }
+
+  // ── 초기화 ─────────────────────────────────────────────────────
   resetAll();
   setupEndButton();
+  setupMobileControls();
   requestAnimationFrame(update);
 })();
