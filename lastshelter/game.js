@@ -124,36 +124,53 @@
     return { w, h, roadW, left, right, top, bottom };
   }
 
-  function spawnWave() {
-    state.wave += 1;
+function spawnWave() {
+  state.wave += 1;
 
-    const { left, right } = getRoadBounds();
+  const { left, right } = getRoadBounds();
 
-    const baseCount = 160;
-    const growth = 40;
-    const count = Math.floor(baseCount + (state.stage - 1) * growth + state.wave * 10);
+  // 🔹 스테이지1 기준 25~40 범위
+  // 이후 스테이지마다 점진 증가
+  const baseMin = 25;
+  const baseMax = 40;
 
-    const hpBase = 18;
-    const hpGrowth = 7;
-    const hp = hpBase + (state.stage - 1) * hpGrowth;
+  const stageGrowth = (state.stage - 1) * 12;
+  const waveGrowth = (state.wave - 1) * 4;
 
-    for (let i = 0; i < count; i++) {
-      const x = rand(left + 12, right - 12);
-      const y = rand(-520, -20);
-      const spd = rand(46, 86) + state.stage * 3;
-      state.zombies.push({
-        x, y,
-        r: rand(6.5, 9.5),
-        hp: hp + rand(-3, 6),
-        maxHp: hp,
-        spd,
-      });
-    }
+  const minCount = baseMin + stageGrowth + waveGrowth;
+  const maxCount = baseMax + stageGrowth + waveGrowth;
 
-    if (state.wave % state.bossEveryWaves === 0) {
-      spawnBoss();
-    }
+  const count = Math.floor(rand(minCount, maxCount));
+
+  // 체력
+  const hpBase = 18;
+  const hpGrowth = 6;
+  const hp = hpBase + (state.stage - 1) * hpGrowth;
+
+  // 🔹 속도 15% 감소 (기존 46~86 → 0.85배)
+  const speedMul = 0.85;
+
+  for (let i = 0; i < count; i++) {
+    const x = rand(left + 12, right - 12);
+    const y = rand(-520, -20);
+
+    const baseSpeed = rand(46, 86) + state.stage * 3;
+    const spd = baseSpeed * speedMul;
+
+    state.zombies.push({
+      x,
+      y,
+      r: rand(6.5, 9.5),
+      hp: hp + rand(-3, 6),
+      maxHp: hp,
+      spd
+    });
   }
+
+  if (state.wave % state.bossEveryWaves === 0) {
+    spawnBoss();
+  }
+}
 
   function spawnBoss() {
     const { left, right } = getRoadBounds();
@@ -794,7 +811,7 @@
 
   function render() {
     const { w, h, roadW, left, right, top, bottom } = getRoadBounds();
-
+    
     // 배경
     ctx.fillStyle = "#0b0f14";
     ctx.fillRect(0, 0, w, h);
