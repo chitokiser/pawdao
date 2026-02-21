@@ -91,11 +91,13 @@ btnRestart.addEventListener("click", () => {
 if (btnAir)    btnAir.addEventListener("click",    () => startAirstrike());
 if (btnFreeze) btnFreeze.addEventListener("click", () => useFreeze());
 
-// ─── 모바일 폭격 / 프리즈 버튼 ──────────────────────────────────────────────
-const btnAirMob    = document.getElementById("btnAirMob");
-const btnFreezeMob = document.getElementById("btnFreezeMob");
-const uiAirMob     = document.getElementById("uiAirMob");
-const uiFreezeMob  = document.getElementById("uiFreezeMob");
+// ─── 모바일 폭격 / 프리즈 / 클레모어 버튼 ───────────────────────────────────
+const btnAirMob      = document.getElementById("btnAirMob");
+const btnFreezeMob   = document.getElementById("btnFreezeMob");
+const btnClaymoreMob = document.getElementById("btnClaymoreMob");
+const uiAirMob       = document.getElementById("uiAirMob");
+const uiFreezeMob    = document.getElementById("uiFreezeMob");
+const uiClaymoreMob  = document.getElementById("uiClaymoreMob");
 
 if (btnAirMob) {
   btnAirMob.addEventListener("touchstart", (e) => { e.preventDefault(); startAirstrike(); }, { passive: false });
@@ -105,11 +107,16 @@ if (btnFreezeMob) {
   btnFreezeMob.addEventListener("touchstart", (e) => { e.preventDefault(); useFreeze(); }, { passive: false });
   btnFreezeMob.addEventListener("mousedown",  (e) => { e.preventDefault(); useFreeze(); });
 }
+if (btnClaymoreMob) {
+  btnClaymoreMob.addEventListener("touchstart", (e) => { e.preventDefault(); useClaymore(); }, { passive: false });
+  btnClaymoreMob.addEventListener("mousedown",  (e) => { e.preventDefault(); useClaymore(); });
+}
 
 // 모바일 버튼 카운트 동기화 (매 프레임)
 (function mobCountLoop() {
-  if (uiAirMob)    uiAirMob.textContent    = String(state.airCharges   ?? 0);
-  if (uiFreezeMob) uiFreezeMob.textContent = String(state.freezeCharges ?? 0);
+  if (uiAirMob)      uiAirMob.textContent      = String(state.airCharges      ?? 0);
+  if (uiFreezeMob)   uiFreezeMob.textContent   = String(state.freezeCharges   ?? 0);
+  if (uiClaymoreMob) uiClaymoreMob.textContent = String(state.claymoreCharges ?? 0);
   requestAnimationFrame(mobCountLoop);
 })();
 

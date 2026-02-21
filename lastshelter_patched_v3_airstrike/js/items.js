@@ -103,6 +103,44 @@ function updateAirstrike(dt) {
   }
 }
 
+// ─── Claymore ─────────────────────────────────────────────────────────────────
+function spawnClaymorePickup(x, y) {
+  state.pickups.push({ type: "claymore", x, y, vy: rand(20, 50), bob: rand(0, Math.PI * 2), t: 10.0 });
+}
+
+function useClaymore() {
+  if (!state.running || state.paused) return;
+  if (state.claymoreCharges <= 0) { showToast("클레모어 없음"); return; }
+  state.claymoreCharges -= 1;
+  if (uiClaymore) uiClaymore.textContent = state.claymoreCharges;
+
+  const { w } = getRoadBounds();
+  const px = w / 2 + state.leaderX;
+  const py = state.leaderY;
+  const radius = 280; // 반경 10m
+
+  let killed = 0;
+  for (let i = state.zombies.length - 1; i >= 0; i--) {
+    const z = state.zombies[i];
+    if (Math.hypot(z.x - px, z.y - py) <= radius) {
+      for (let k = 0; k < 5; k++) {
+        const ang = rand(0, Math.PI * 2);
+        const spd = rand(50, 200);
+        state.particles.push({ x: z.x, y: z.y, vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd, r: rand(1.2, 3), t: rand(0.15, 0.45) });
+      }
+      state.zombies.splice(i, 1);
+      killed++;
+    }
+  }
+
+  state.flashT    = 0.15;
+  state.shakeTMax = 0.25;
+  state.shakeT    = state.shakeTMax;
+  state.shakeMag  = 10;
+
+  showToast(`💣 클레모어! ${killed}명 처치`);
+}
+
 // ─── Freeze ───────────────────────────────────────────────────────────────────
 function spawnFreezePickup(x, y) {
   state.pickups.push({ type: "freeze", x, y, vy: rand(20, 50), bob: rand(0, Math.PI * 2), t: 10.0 });

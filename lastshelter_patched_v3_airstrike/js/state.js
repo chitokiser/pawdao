@@ -71,6 +71,11 @@ const state = {
   freezeT:       0,
   freezeDropCd:  0,
 
+  // claymore
+  claymoreCharges: 0,
+
+  iframes: 0,        // 무적 시간(초) — 접촉 사망 후 5초
+
   isFiring: false,   // 스페이스바 / 발사버튼 누르는 동안 true
 
   score:     0,      // 누적 점수 (좀비 처치 + 보스 보너스)
@@ -131,10 +136,12 @@ function reset() {
   state.airAnim    = null;
   state.flashT     = 0;
 
-  state.freezeCharges = 0;
-  state.freezeT       = 0;
-  state.freezeDropCd  = 0;
+  state.freezeCharges  = 0;
+  state.freezeT        = 0;
+  state.freezeDropCd   = 0;
+  state.claymoreCharges = 0;
 
+  state.iframes    = 0;
   state.isFiring   = false;
   state.score      = 0;
   state.killCount  = 0;
@@ -146,8 +153,9 @@ function reset() {
   uiStage.textContent  = state.stage;
   uiAllies.textContent = state.allies;
   uiDps.textContent    = Math.round(state.allies * state.baseDmg * state.fireRate);
-  if (uiAir)    uiAir.textContent    = state.airCharges;
-  if (uiFreeze) uiFreeze.textContent = state.freezeCharges;
+  if (uiAir)      uiAir.textContent      = state.airCharges;
+  if (uiFreeze)   uiFreeze.textContent   = state.freezeCharges;
+  if (uiClaymore) uiClaymore.textContent = state.claymoreCharges;
 }
 
 function getRoadBounds() {

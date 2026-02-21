@@ -216,3 +216,12 @@ canvas{
   box-shadow:0 0 16px rgba(100,200,255,.22);
 }
 .freeze-mob:active{ background:rgba(100,200,255,.22); }
+
+/* 클레모어: 프리즈 버튼 바로 위 */
+.claymore-mob{
+  left:14px;
+  bottom:166px;
+  border-color:rgba(255,200,60,.6);
+  box-shadow:0 0 16px rgba(255,200,60,.22);
+}
+.claymore-mob:active{ background:rgba(255,200,60,.22); }

@@ -21,6 +21,9 @@ function update(dt) {
   // die sound cooldown
   if (state.dieSoundCd > 0)  { state.dieSoundCd -= dt;  if (state.dieSoundCd < 0) state.dieSoundCd = 0; }
 
+  // 무적 타이머
+  if (state.iframes > 0)     { state.iframes -= dt;     if (state.iframes < 0) state.iframes = 0; }
+
   // camera shake decay
   if (state.shakeT > 0)      { state.shakeT -= dt;      if (state.shakeT < 0) state.shakeT = 0; }
 
@@ -132,9 +135,13 @@ function update(dt) {
       } catch (e) {}
       state.pickups.splice(i, 1);
       if (p.type === "freeze") {
-        state.freezeCharges = Math.min(3, state.freezeCharges + 1);
+        state.freezeCharges = Math.min(5, state.freezeCharges + 1);
         if (uiFreeze) uiFreeze.textContent = state.freezeCharges;
         showToast("❄ 프리즈 아이템 획득");
+      } else if (p.type === "claymore") {
+        state.claymoreCharges = Math.min(5, state.claymoreCharges + 1);
+        if (uiClaymore) uiClaymore.textContent = state.claymoreCharges;
+        showToast("💣 클레모어 획득");
       } else {
         grantAirstrike(1);
       }

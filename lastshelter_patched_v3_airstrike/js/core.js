@@ -8,8 +8,9 @@ const DPR = Math.min(2, window.devicePixelRatio || 1);
 const uiStage  = document.getElementById("uiStage");
 const uiAllies = document.getElementById("uiAllies");
 const uiDps    = document.getElementById("uiDps");
-const uiAir    = document.getElementById("uiAir");
-const uiFreeze = document.getElementById("uiFreeze");
+const uiAir      = document.getElementById("uiAir");
+const uiFreeze   = document.getElementById("uiFreeze");
+const uiClaymore = document.getElementById("uiClaymore");
 
 // Buttons
 const btnPause   = document.getElementById("btnPause");

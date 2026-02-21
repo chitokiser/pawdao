@@ -125,6 +125,12 @@ function drawAllies() {
   const alliesPos = getAllyPositions();
   const { w, top, bottom } = getRoadBounds();
 
+  // 무적 중: 빠르게 깜빡임 (sin 기반 alpha)
+  const invincible = state.iframes > 0;
+  const blinkAlpha = invincible
+    ? 0.35 + 0.65 * Math.abs(Math.sin(state.time * 14))
+    : 1;
+
   for (let i = 0; i < alliesPos.length; i++) {
     const p = alliesPos[i];
 
@@ -134,15 +140,18 @@ function drawAllies() {
 
     const sz = ((i === 0) ? TUNE.heroSize : TUNE.allySize) * ps;
 
-    // ground glow ring
-    ctx.strokeStyle = "rgba(66,245,161,.22)";
-    ctx.lineWidth = 2;
+    // ground glow ring (무적 중 파란색)
+    ctx.strokeStyle = invincible ? "rgba(80,180,255,.60)" : "rgba(66,245,161,.22)";
+    ctx.lineWidth = invincible ? 3 : 2;
     ctx.beginPath();
     ctx.arc(p.x, p.y + 10 * ps, 16 * ps, 0, Math.PI * 2);
     ctx.stroke();
 
     drawShadow(p.x, p.y + 18 * ps, 14 * ps, 6 * ps, 0.25);
+    ctx.save();
+    ctx.globalAlpha = blinkAlpha;
     drawImageAnchored(IMG.hero, p.x, p.y, sz, sz, 0.5, 0.58, 1);
+    ctx.restore();
   }
 
   // leader marker
@@ -316,7 +325,8 @@ function drawPickups() {
   for (let i = 0; i < state.pickups.length; i++) {
     const p        = state.pickups[i];
     const bob      = Math.sin(state.time * 4 + p.bob) * 4;
-    const isFreeze = p.type === "freeze";
+    const isFreeze   = p.type === "freeze";
+    const isClaymore = p.type === "claymore";
 
     drawShadow(p.x, p.y + 18 + bob, 14, 5, 0.18);
 
@@ -324,7 +334,7 @@ function drawPickups() {
     ctx.translate(p.x, p.y + bob);
     ctx.globalAlpha = 0.92;
 
-    ctx.fillStyle = isFreeze ? "rgba(10,20,40,.80)" : "rgba(20,25,35,.75)";
+    ctx.fillStyle = isFreeze ? "rgba(10,20,40,.80)" : isClaymore ? "rgba(30,15,5,.85)" : "rgba(20,25,35,.75)";
     ctx.beginPath();
     ctx.arc(0, 0, 16, 0, Math.PI * 2);
     ctx.fill();
@@ -347,6 +357,26 @@ function drawPickups() {
       ctx.font = "10px system-ui, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("ICE", 0, 26);
+      ctx.textAlign = "left";
+    } else if (isClaymore) {
+      // 폭발 방향 화살표 4개
+      ctx.strokeStyle = "rgba(255,180,50,.95)";
+      ctx.lineWidth = 2;
+      const dirs = [0, Math.PI/2, Math.PI, Math.PI*3/2];
+      for (const d of dirs) {
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(d)*4, Math.sin(d)*4);
+        ctx.lineTo(Math.cos(d)*11, Math.sin(d)*11);
+        ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(255,200,80,.95)";
+      ctx.beginPath();
+      ctx.arc(0, 0, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "rgba(255,220,120,.95)";
+      ctx.font = "10px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("CMR", 0, 26);
       ctx.textAlign = "left";
     } else {
       ctx.strokeStyle = "rgba(255,120,120,.95)";

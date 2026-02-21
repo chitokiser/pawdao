@@ -419,7 +419,6 @@
       ball.vx *= 0.98;
       ball.vy *= 0.98;
       ball.av *= 0.98;
-      vib(6);
     }
     return true;
   }
@@ -768,18 +767,18 @@
     style.textContent = `
       .suika-end {
         position: absolute;
-        right: 14px;
-        bottom: 14px;
+        right: 8px;
+        top: 6px;
         z-index: 9999;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px 14px;
+        gap: 5px;
+        padding: 4px 8px;
         border-radius: 999px;
-        border: 1px solid rgba(255,255,255,.18);
-        background: rgba(0,0,0,.50);
+        border: 1px solid rgba(255,255,255,.22);
+        background: rgba(0,0,0,.45);
         color: #eaf1ff;
-        font-size: 14px;
+        font-size: 11px;
         font-weight: 700;
         cursor: pointer;
         user-select: none;
@@ -789,10 +788,10 @@
       .suika-end .badge {
         display: inline-flex;
         align-items: center;
-        padding: 4px 10px;
+        padding: 2px 6px;
         border-radius: 999px;
         border: 1px solid rgba(255,255,255,.14);
-        background: rgba(255,255,255,.08);
+        background: rgba(255,255,255,.10);
         font-weight: 900;
       }
     `;

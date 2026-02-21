@@ -178,12 +178,13 @@ function bulletCollisions() {
           const bonus = 100;
           state.score += bonus;
           if (typeof updateScoreBadge === 'function') updateScoreBadge();
-          // 프리즈 5개 + 폭격 5개 드롭
+          // 폭격 5개 + 프리즈 5개 + 클레모어 5개 드롭
           for (let di = 0; di < 5; di++) {
-            spawnFreezePickup(bx + rand(-60, 60), by + rand(-30, 30));
-            spawnAirstrikePickup(bx + rand(-60, 60), by + rand(-30, 30));
+            spawnAirstrikePickup(bx + rand(-80, 80), by + rand(-40, 40));
+            spawnFreezePickup(bx + rand(-80, 80), by + rand(-40, 40));
+            spawnClaymorePickup(bx + rand(-80, 80), by + rand(-40, 40));
           }
-          showToast(`boss 처치 +${bonus} 💥×5 ❄×5`);
+          showToast(`boss 처치 +${bonus} 💥×5 ❄×5 💣×5`);
         }
       }
     }
@@ -225,6 +226,7 @@ function bulletCollisions() {
 
 // ─── Contact deaths ───────────────────────────────────────────────────────────
 function contactDeaths() {
+  if (state.iframes > 0) return;  // 무적 중 충돌 무시
   const alliesPos = getAllyPositions();
   if (alliesPos.length === 0) return;
   const { top, bottom } = getRoadBounds();
@@ -258,7 +260,12 @@ function contactDeaths() {
     state.allies = Math.max(0, state.allies - 1);
     uiAllies.textContent = state.allies;
     uiDps.textContent = Math.round(state.allies * state.baseDmg * state.fireRate);
-    showToast("접촉 사망: allies -1");
+    if (state.allies > 0) {
+      state.iframes = 5.0;
+      showToast("접촉 사망: allies -1  🛡 무적 5초");
+    } else {
+      showToast("접촉 사망: allies -1");
+    }
 
     const p = alliesPos[hitIndex];
     for (let k = 0; k < 18; k++) {
