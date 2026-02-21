@@ -173,11 +173,17 @@ function bulletCollisions() {
         state.particles.push({ x: b.x, y: b.y, vx: rand(-50,50), vy: rand(-50,50), r: rand(1,3), t: rand(0.08,0.2) });
         b.pierce = 0;
         if (boss.hp <= 0) {
+          const bx = boss.x, by = boss.y;
           state.boss = null;
           const bonus = 100;
           state.score += bonus;
           if (typeof updateScoreBadge === 'function') updateScoreBadge();
-          showToast(`boss 처치 +${bonus}`);
+          // 프리즈 5개 + 폭격 5개 드롭
+          for (let di = 0; di < 5; di++) {
+            spawnFreezePickup(bx + rand(-60, 60), by + rand(-30, 30));
+            spawnAirstrikePickup(bx + rand(-60, 60), by + rand(-30, 30));
+          }
+          showToast(`boss 처치 +${bonus} 💥×5 ❄×5`);
         }
       }
     }

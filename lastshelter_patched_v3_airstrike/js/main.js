@@ -64,8 +64,10 @@ if (btnFire) {
 // ─── UI helpers ───────────────────────────────────────────────────────────────
 function stopGunSound() {
   try {
-    const s = state.sounds && (state.sounds.gun || state.sounds.mg);
-    if (s && !s.paused) s.pause();
+    const gun = state.sounds && state.sounds.gun;
+    if (gun && !gun.paused) { gun.pause(); gun.currentTime = 0; }
+    const mg = state.sounds && state.sounds.mg;
+    if (mg && !mg.paused) { mg.pause(); mg.currentTime = 0; }
   } catch (e) {}
 }
 

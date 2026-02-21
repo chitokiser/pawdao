@@ -40,19 +40,19 @@
 
   // 과일 11단계(fruit_10까지) — 크기 추가 +25% 난이도 상향
   // images 폴더에 fruit_0.png ... fruit_10.png 넣으면 자동 로드
-  // 과일 크기 +40% (난이도 상향)
+  // 과일 크기 -40% 조정
   const FRUIT_LEVELS = [
-    { r: 39,  file: 'fruit_0.png' },
-    { r: 46,  file: 'fruit_1.png' },
-    { r: 55,  file: 'fruit_2.png' },
-    { r: 64,  file: 'fruit_3.png' },
-    { r: 76,  file: 'fruit_4.png' },
-    { r: 88,  file: 'fruit_5.png' },
-    { r: 105, file: 'fruit_6.png' },
-    { r: 126, file: 'fruit_7.png' },
-    { r: 151, file: 'fruit_8.png' },
-    { r: 181, file: 'fruit_9.png' },
-    { r: 217, file: 'fruit_10.png' }, // 최대 단계
+    { r: 23,  file: 'fruit_0.png' },
+    { r: 28,  file: 'fruit_1.png' },
+    { r: 33,  file: 'fruit_2.png' },
+    { r: 38,  file: 'fruit_3.png' },
+    { r: 46,  file: 'fruit_4.png' },
+    { r: 53,  file: 'fruit_5.png' },
+    { r: 63,  file: 'fruit_6.png' },
+    { r: 76,  file: 'fruit_7.png' },
+    { r: 91,  file: 'fruit_8.png' },
+    { r: 109, file: 'fruit_9.png' },
+    { r: 130, file: 'fruit_10.png' }, // 최대 단계
   ];
 
   /* =========================================================

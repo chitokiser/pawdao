@@ -92,7 +92,14 @@ function updateAirstrike(dt) {
 
       for (let i = 0; i < state.zombies.length; i++) state.zombies[i]._air = false;
     }
-    if (a.t > 1.25) state.airAnim = null;
+    if (a.t > 1.25) {
+      state.airAnim = null;
+      // 폭격 중 재생된 mg/gun 루프 사운드 정지
+      try {
+        const mg = state.sounds && state.sounds.mg;
+        if (mg && !mg.paused) { mg.pause(); mg.currentTime = 0; }
+      } catch (e) {}
+    }
   }
 }
 
