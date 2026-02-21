@@ -1,0 +1,47 @@
+<!-- /index.html -->
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Suika (Nintendo-like)</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <div id="wrap">
+    <div class="top">
+      <div class="brand">SUIKA</div>
+      <div class="score">SCORE: <span id="score">0</span></div>
+    </div>
+
+    <div id="overlay" class="overlay">
+      <div class="card">
+        <div class="title">Suika</div>
+        <div class="desc">
+          마우스 이동: 가이드 이동<br />
+          마우스 왼쪽 클릭 또는 스페이스바: 즉시 투하<br />
+          같은 과일 3개가 붙으면 다음 단계로 합체됩니다
+        </div>
+        <button id="btnStart">Start</button>
+        <div class="hint">첫 입력 후 사운드 활성화</div>
+      </div>
+    </div>
+
+    <div id="gameOver" class="overlay overlay-dark">
+      <div class="card">
+        <div class="title">GAME OVER</div>
+        <div class="desc">Restart를 누르세요</div>
+        <button id="btnRestart">Restart</button>
+      </div>
+    </div>
+
+    <canvas id="game"></canvas>
+  </div>
+
+  <!-- module 제거: import 문제로 Start가 안 되는 케이스를 원천 차단 -->
+  <script src="game.js"></script>
+</body>
+
+</html>

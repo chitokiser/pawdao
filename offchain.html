@@ -169,6 +169,36 @@
 
         <div class="note">라스트셸터에서 END를 누르면 점수+서명이 저장되고, 다시 이 페이지로 돌아옵니다.</div>
       </section>
+
+      <!-- 수이카 게임 카드 -->
+      <section class="card game-card">
+        <div class="card-h">수이카(과일합치기)</div>
+
+        <div class="row" style="margin-bottom:10px;">
+          <button class="btn" id="btnJoinSu">수이카 게임 시작 (joinGame)</button>
+          <div class="pill" id="joinHintSu">-</div>
+        </div>
+        <div class="note">게임 시작 시 pending 상태가 됩니다. (타임아웃 지나면 자동 해제)</div>
+
+        <div class="hr" style="margin:14px 0;"></div>
+
+        <div class="row" style="margin-bottom:10px;">
+          <div class="pill">점수</div>
+          <div class="pill onchain" id="suScore">-</div>
+          <button class="btn" id="btnSaveSu">결과 저장 (saveGame)</button>
+          <div class="pill" id="saveHintSu">-</div>
+        </div>
+        <div class="note">pending 상태에서만 saveGame이 됩니다. 점수 직접 입력은 없습니다.</div>
+
+        <div class="hr" style="margin:14px 0;"></div>
+
+        <div class="row">
+          <a class="btn ghost" href="#" id="btnOpenSuika">수이카 게임 실행</a>
+          <div class="pill" id="openHintSu">-</div>
+        </div>
+
+        <div class="note">수이카에서 END를 누르면 점수+서명이 저장되고, 다시 이 페이지로 돌아옵니다.</div>
+      </section>
     </main>
 
     <div id="site-footer"></div>

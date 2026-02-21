@@ -165,3 +165,9 @@ canvas{
   background:rgba(66,245,161,.18);
   border-color:rgba(66,245,161,.9);
 }
+/* 자동 발사 ON 상태 */
+.fire-btn.active{
+  background:rgba(66,245,161,.30);
+  border-color:#42f5a1;
+  box-shadow:0 0 28px rgba(66,245,161,.55);
+}

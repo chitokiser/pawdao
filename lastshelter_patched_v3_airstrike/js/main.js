@@ -45,17 +45,20 @@ window.addEventListener("keyup", (e) => {
   if (e.code === "Space") { state.isFiring = false; }
 });
 
-// ─── 모바일 발사 버튼 ──────────────────────────────────────────────────────────
+// ─── 모바일 발사 버튼 (토글: 한 번 누르면 자동 발사 ON, 다시 누르면 OFF) ────
 const btnFire = document.getElementById("btnFire");
+function setAutoFire(on) {
+  state.isFiring = on;
+  if (btnFire) btnFire.classList.toggle("active", on);
+}
 if (btnFire) {
-  const startFire = (e) => { e.preventDefault(); state.isFiring = true; if (!state.running) startGame(); };
-  const stopFire  = (e) => { e.preventDefault(); state.isFiring = false; };
-  btnFire.addEventListener("mousedown",  startFire);
-  btnFire.addEventListener("touchstart", startFire, { passive: false });
-  btnFire.addEventListener("mouseup",    stopFire);
-  btnFire.addEventListener("mouseleave", stopFire);
-  btnFire.addEventListener("touchend",   stopFire,  { passive: false });
-  btnFire.addEventListener("touchcancel",stopFire,  { passive: false });
+  const toggle = (e) => {
+    e.preventDefault();
+    if (!state.running) { startGame(); return; }
+    setAutoFire(!state.isFiring);
+  };
+  btnFire.addEventListener("touchstart", toggle, { passive: false });
+  btnFire.addEventListener("mousedown",  toggle);
 }
 
 // ─── UI helpers ───────────────────────────────────────────────────────────────
@@ -71,10 +74,11 @@ btnPause.addEventListener("click", () => {
   state.paused = !state.paused;
   btnPause.textContent = state.paused ? "resume" : "pause";
   showToast(state.paused ? "일시정지" : "재개");
-  if (state.paused) { stopGunSound(); state.isFiring = false; }
+  if (state.paused) { stopGunSound(); setAutoFire(false); }
 });
 
 btnRestart.addEventListener("click", () => {
+  setAutoFire(false);
   reset();
   overlay.classList.remove("hidden");
   ovTitle.textContent = "ready";

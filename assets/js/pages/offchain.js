@@ -55,6 +55,18 @@
       btnSave: "btnSaveLs",
       saveHint: "saveHintLs",
     },
+    suika: {
+      id: "suika",
+      title: "수이카",
+      openPath: "suika_fixed/index.html",
+      btnJoin: "btnJoinSu",
+      joinHint: "joinHintSu",
+      btnOpen: "btnOpenSuika",
+      openHint: "openHintSu",
+      scoreView: "suScore",
+      btnSave: "btnSaveSu",
+      saveHint: "saveHintSu",
+    },
   };
 
   const LS = {
