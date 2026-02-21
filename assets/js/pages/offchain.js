@@ -43,6 +43,18 @@
       btnSave: "btnSaveBr",
       saveHint: "saveHintBr",
     },
+    lastshelter: {
+      id: "lastshelter",
+      title: "라스트셸터",
+      openPath: "lastshelter_patched_v3_airstrike/index.html",
+      btnJoin: "btnJoinLs",
+      joinHint: "joinHintLs",
+      btnOpen: "btnOpenLastshelter",
+      openHint: "openHintLs",
+      scoreView: "lsScore",
+      btnSave: "btnSaveLs",
+      saveHint: "saveHintLs",
+    },
   };
 
   const LS = {

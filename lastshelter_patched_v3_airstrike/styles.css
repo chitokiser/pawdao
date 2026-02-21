@@ -1,0 +1,167 @@
+/* /styles.css */
+:root{
+  --bg:#0b0f14;
+  --panel:#101826;
+  --line:#22324a;
+  --text:#e8eef8;
+  --muted:#9fb0c7;
+  --accent:#42f5a1;
+  --danger:#ff5d5d;
+  --warn:#ffcc66;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background: radial-gradient(1200px 600px at 50% 30%, #111c2d, var(--bg));
+  color:var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, sans-serif;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+}
+
+.wrap{
+  height:100%;
+  width:100%;
+  max-width:480px;
+  display:flex;
+  flex-direction:column;
+}
+
+.hud{
+  padding:10px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  background: rgba(0,0,0,.25);
+  backdrop-filter: blur(10px);
+}
+
+.hud .left, .hud .right{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+
+.badge{
+  padding:6px 10px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:999px;
+  background: rgba(16,24,38,.6);
+  color:var(--text);
+  font-size:13px;
+}
+
+.btn{
+  appearance:none;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(16,24,38,.7);
+  color:var(--text);
+  padding:7px 10px;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:13px;
+}
+.btn:hover{border-color: rgba(255,255,255,.26)}
+.btn.big{padding:10px 14px; font-size:14px}
+
+.game{
+  position:relative;
+  flex:1;
+  min-height:0;
+}
+
+canvas{
+  width:100%;
+  height:100%;
+  display:block;
+  touch-action:none;
+}
+
+.overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(6px);
+}
+.overlay.hidden{display:none}
+
+.panel{
+  width:min(520px, calc(100% - 28px));
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(16,24,38,.78);
+  border-radius:18px;
+  padding:16px;
+  box-shadow: 0 20px 80px rgba(0,0,0,.45);
+}
+.title{font-size:20px; margin-bottom:6px}
+.desc{color:var(--muted); font-size:14px; margin-bottom:12px}
+
+.toast{
+  position:absolute;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.45);
+  color:var(--text);
+  font-size:13px;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .2s ease;
+}
+.toast.show{opacity:1}
+
+.tip{
+  padding:10px 12px;
+  color:var(--muted);
+  font-size:12px;
+  border-top:1px solid rgba(255,255,255,.06);
+  background: rgba(0,0,0,.18);
+}
+/* disabled */
+.btn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+
+/* airstrike button */
+.btn.warn{ border-color: rgba(255,120,120,.55); color:#ffe8e8; }
+.btn.warn:hover{ background: rgba(255,120,120,.12); }
+
+/* freeze button */
+.btn.ice{ border-color: rgba(100,200,255,.55); color:#d0f0ff; }
+.btn.ice:hover{ background: rgba(100,200,255,.12); }
+
+/* 모바일 발사 버튼 (캔버스 우하단 고정) */
+.fire-btn{
+  position:absolute;
+  right:14px;
+  bottom:14px;
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  border:2px solid rgba(66,245,161,.6);
+  background:rgba(16,24,38,.75);
+  color:var(--text);
+  font-size:28px;
+  cursor:pointer;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 0 18px rgba(66,245,161,.22);
+  z-index:10;
+}
+.fire-btn:active{
+  background:rgba(66,245,161,.18);
+  border-color:rgba(66,245,161,.9);
+}

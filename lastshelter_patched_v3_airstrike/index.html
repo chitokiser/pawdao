@@ -1,0 +1,62 @@
+<!-- /index.html -->
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>Last Shelter</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="hud">
+      <div class="left">
+        <div class="badge">stage <span id="uiStage">1</span></div>
+        <div class="badge">allies <span id="uiAllies">1</span></div>
+        <div class="badge">dps <span id="uiDps">10</span></div>
+        <div class="badge">air <span id="uiAir">0</span></div>
+        <div class="badge">❄ <span id="uiFreeze">0</span></div>
+        <div class="badge">score <span id="uiScore">0</span></div>
+      </div>
+      <div class="right">
+        <button id="btnAir" class="btn warn">airstrike (F)</button>
+        <button id="btnFreeze" class="btn ice">freeze (S)</button>
+        <button id="btnPause" class="btn">pause</button>
+        <button id="btnRestart" class="btn">restart</button>
+      </div>
+    </header>
+
+    <main class="game">
+      <canvas id="c"></canvas>
+
+      <div class="overlay" id="overlay">
+        <div class="panel">
+          <div class="title" id="ovTitle">loading</div>
+          <div class="desc" id="ovDesc">assets loading...</div>
+          <button id="btnStart" class="btn big">start</button>
+        </div>
+      </div>
+
+      <div class="toast" id="toast"></div>
+
+      <!-- 모바일 발사 버튼 (우하단 고정) -->
+      <button id="btnFire" class="fire-btn" aria-label="fire">🔫</button>
+    </main>
+
+    <footer class="tip">
+      이동: 마우스/터치 드래그 또는 방향키(WASD) · F: 폭격 · S: 프리즈 · 좀비는 위→아래 이동 · 접촉하면 해당 병력 1명만 사망
+    </footer>
+  </div>
+
+  <!-- load order matters: core → assets → state → entities → items → combat → render → update → main -->
+  <script src="./js/core.js"></script>
+  <script src="./js/assets.js"></script>
+  <script src="./js/state.js"></script>
+  <script src="./js/entities.js"></script>
+  <script src="./js/items.js"></script>
+  <script src="./js/combat.js"></script>
+  <script src="./js/render.js"></script>
+  <script src="./js/update.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+</html>
