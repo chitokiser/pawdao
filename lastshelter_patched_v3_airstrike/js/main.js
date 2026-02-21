@@ -89,6 +89,28 @@ btnRestart.addEventListener("click", () => {
 if (btnAir)    btnAir.addEventListener("click",    () => startAirstrike());
 if (btnFreeze) btnFreeze.addEventListener("click", () => useFreeze());
 
+// ─── 모바일 폭격 / 프리즈 버튼 ──────────────────────────────────────────────
+const btnAirMob    = document.getElementById("btnAirMob");
+const btnFreezeMob = document.getElementById("btnFreezeMob");
+const uiAirMob     = document.getElementById("uiAirMob");
+const uiFreezeMob  = document.getElementById("uiFreezeMob");
+
+if (btnAirMob) {
+  btnAirMob.addEventListener("touchstart", (e) => { e.preventDefault(); startAirstrike(); }, { passive: false });
+  btnAirMob.addEventListener("mousedown",  (e) => { e.preventDefault(); startAirstrike(); });
+}
+if (btnFreezeMob) {
+  btnFreezeMob.addEventListener("touchstart", (e) => { e.preventDefault(); useFreeze(); }, { passive: false });
+  btnFreezeMob.addEventListener("mousedown",  (e) => { e.preventDefault(); useFreeze(); });
+}
+
+// 모바일 버튼 카운트 동기화 (매 프레임)
+(function mobCountLoop() {
+  if (uiAirMob)    uiAirMob.textContent    = String(state.airCharges   ?? 0);
+  if (uiFreezeMob) uiFreezeMob.textContent = String(state.freezeCharges ?? 0);
+  requestAnimationFrame(mobCountLoop);
+})();
+
 btnStart.addEventListener("click", startGame);
 
 function startGame() {

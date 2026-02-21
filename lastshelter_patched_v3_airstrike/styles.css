@@ -171,3 +171,48 @@ canvas{
   border-color:#42f5a1;
   box-shadow:0 0 28px rgba(66,245,161,.55);
 }
+
+/* 모바일 액션 버튼 공통 (좌하단) */
+.mob-action-btn{
+  position:absolute;
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.25);
+  background:rgba(16,24,38,.75);
+  color:var(--text);
+  font-size:24px;
+  cursor:pointer;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:1px;
+  z-index:10;
+}
+.mob-count{
+  font-size:12px;
+  font-weight:800;
+  line-height:1;
+}
+
+/* 폭격: 좌하단 */
+.air-mob{
+  left:14px;
+  bottom:14px;
+  border-color:rgba(255,120,80,.6);
+  box-shadow:0 0 16px rgba(255,120,80,.22);
+}
+.air-mob:active{ background:rgba(255,120,80,.22); }
+
+/* 프리즈: 폭격 버튼 바로 위 */
+.freeze-mob{
+  left:14px;
+  bottom:90px;
+  border-color:rgba(100,200,255,.6);
+  box-shadow:0 0 16px rgba(100,200,255,.22);
+}
+.freeze-mob:active{ background:rgba(100,200,255,.22); }
