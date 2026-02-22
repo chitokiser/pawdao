@@ -39,6 +39,7 @@ window.addEventListener("keydown", (e) => {
   if (e.code === "Space")  { e.preventDefault(); state.isFiring = true; }
   if (e.code === "KeyF")   { e.preventDefault(); startAirstrike(); }
   if (e.code === "KeyS" && !e.repeat) { e.preventDefault(); keys.delete(e.key); useFreeze(); }
+  if (e.code === "KeyD" && !e.repeat) { e.preventDefault(); useClaymore(); }
 });
 window.addEventListener("keyup", (e) => {
   keys.delete(e.key);

@@ -35,6 +35,7 @@ const SOUND_SRC = {
   zombie: "./sound/zombie-sound.mp3",
   boss:   "./sound/zombie-boss.mp3",
   call:   "./sound/zombie-call.mp3",
+  cre:    "./sound/cre.mp3",
 };
 
 function applyVolumes(SND) {

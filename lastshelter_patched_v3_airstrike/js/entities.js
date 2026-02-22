@@ -52,7 +52,7 @@ function spawnWave() {
 // ─── Boss spawn ───────────────────────────────────────────────────────────────
 function spawnBoss() {
   const { left, right, top } = getRoadBounds();
-  const maxHp    = 11000 + (state.stage - 1) * 4500;
+  const maxHp    = Math.round((11000 + (state.stage - 1) * 4500) / 3);
   const baseSize = TUNE.bossSize;
 
   state.boss = {

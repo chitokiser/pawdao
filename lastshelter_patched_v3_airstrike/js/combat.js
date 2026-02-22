@@ -173,18 +173,18 @@ function bulletCollisions() {
         state.particles.push({ x: b.x, y: b.y, vx: rand(-50,50), vy: rand(-50,50), r: rand(1,3), t: rand(0.08,0.2) });
         b.pierce = 0;
         if (boss.hp <= 0) {
-          const bx = boss.x, by = boss.y;
           state.boss = null;
           const bonus = 100;
           state.score += bonus;
           if (typeof updateScoreBadge === 'function') updateScoreBadge();
-          // 폭격 5개 + 프리즈 5개 + 클레모어 5개 드롭
-          for (let di = 0; di < 5; di++) {
-            spawnAirstrikePickup(bx + rand(-80, 80), by + rand(-40, 40));
-            spawnFreezePickup(bx + rand(-80, 80), by + rand(-40, 40));
-            spawnClaymorePickup(bx + rand(-80, 80), by + rand(-40, 40));
-          }
-          showToast(`boss 처치 +${bonus} 💥×5 ❄×5 💣×5`);
+          // 폭격 5개 + 프리즈 5개 + 클레모어 5개 즉시 지급
+          state.airCharges      = Math.min(9, state.airCharges      + 5);
+          state.freezeCharges   = Math.min(9, state.freezeCharges   + 5);
+          state.claymoreCharges = Math.min(9, state.claymoreCharges + 5);
+          if (uiAir)      uiAir.textContent      = state.airCharges;
+          if (uiFreeze)   uiFreeze.textContent   = state.freezeCharges;
+          if (uiClaymore) uiClaymore.textContent = state.claymoreCharges;
+          showToast(`boss 처치 +${bonus}점 💥+5 ❄+5 💣+5`);
         }
       }
     }
@@ -234,12 +234,12 @@ function contactDeaths() {
 
   for (let i = 0; i < alliesPos.length && hitIndex === -1; i++) {
     const a = alliesPos[i];
-    const depthT  = clamp((a.y - top) / (bottom - top), 0, 1);
-    const allyHitR = TUNE.allySize * TUNE.allyHitMul * lerp(0.45, 1.0, depthT);
+    const depthT   = clamp((a.y - top) / (bottom - top), 0, 1);
+    const allyHitR = TUNE.allySize * 0.50 * lerp(0.5, 1.0, depthT);
     for (let zi = 0; zi < state.zombies.length; zi++) {
       const z = state.zombies[zi];
       const dx = z.x - a.x, dy = z.y - a.y;
-      const rr = z.hitR + allyHitR;
+      const rr = z.size * 0.38 + allyHitR;
       if (dx*dx + dy*dy <= rr*rr) { hitIndex = i; break; }
     }
   }
@@ -248,10 +248,10 @@ function contactDeaths() {
     const b = state.boss;
     for (let i = 0; i < alliesPos.length; i++) {
       const a = alliesPos[i];
-      const depthT  = clamp((a.y - top) / (bottom - top), 0, 1);
-      const allyHitR = TUNE.allySize * TUNE.allyHitMul * lerp(0.45, 1.0, depthT);
+      const depthT   = clamp((a.y - top) / (bottom - top), 0, 1);
+      const allyHitR = TUNE.allySize * 0.50 * lerp(0.5, 1.0, depthT);
       const dx = b.x - a.x, dy = (b.y + b.size * 0.1) - a.y;
-      const rr = b.hitR + allyHitR;
+      const rr = b.size * 0.35 + allyHitR;
       if (dx*dx + dy*dy <= rr*rr) { hitIndex = i; break; }
     }
   }

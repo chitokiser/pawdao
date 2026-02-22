@@ -138,6 +138,11 @@ function useClaymore() {
   state.shakeT    = state.shakeTMax;
   state.shakeMag  = 10;
 
+  try {
+    const s = state.sounds && state.sounds.cre;
+    if (s) { s.currentTime = 0; s.play().catch(() => {}); }
+  } catch (e) {}
+
   showToast(`💣 클레모어! ${killed}명 처치`);
 }
 

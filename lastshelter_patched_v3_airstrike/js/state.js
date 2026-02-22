@@ -130,16 +130,16 @@ function reset() {
   state.stageScroll = 0;
   state.smokeAcc    = 0;
 
-  state.airCharges = 0;
+  state.airCharges = 3;  // 시작 기본 지급
   state.airDropCd  = 0;
   state.pickups.length = 0;
   state.airAnim    = null;
   state.flashT     = 0;
 
-  state.freezeCharges  = 0;
-  state.freezeT        = 0;
-  state.freezeDropCd   = 0;
-  state.claymoreCharges = 0;
+  state.freezeCharges   = 3;  // 시작 기본 지급
+  state.freezeT         = 0;
+  state.freezeDropCd    = 0;
+  state.claymoreCharges = 3;  // 시작 기본 지급
 
   state.iframes    = 0;
   state.isFiring   = false;
