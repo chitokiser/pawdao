@@ -646,18 +646,18 @@
 
       const score = Number(state.score || 0);
       const nonce = getNonceFromQuery();
-      const address = window.ethereum?.selectedAddress;
+      const address = window.ethereum?.selectedAddress || localStorage.getItem('paw_jump_address');
 
       if(!nonce){
         alert("nonce 없음: offchain에서 게임 시작(joinGame)부터 하세요.");
         return;
       }
       if(!address){
-        alert("지갑 주소 없음: Rabby/MetaMask 연결을 확인하세요.");
+        alert("지갑 주소 없음: offchain 페이지에서 Google 로그인(또는 MetaMask 연결) 후 다시 시도하세요.");
         return;
       }
-      if(!window.ethereum?.request){
-        alert("지갑 provider가 없습니다.");
+      if(!window.ethereum?.request && !window.jumpSign){
+        alert("서명 수단이 없습니다. offchain 페이지에서 Google 로그인 후 다시 시도하세요.");
         return;
       }
 
@@ -665,12 +665,13 @@
 
       let sig = "";
       try{
-        sig = await window.ethereum.request({
-          method: "personal_sign",
-          params: [payload, address],
-        });
-      }catch(_e){
-        alert("서명이 취소되었습니다.");
+        if(window.ethereum?.request){
+          sig = await window.ethereum.request({ method: "personal_sign", params: [payload, address] });
+        } else {
+          sig = await window.jumpSign(payload);
+        }
+      }catch(e){
+        alert("서명 실패: " + (e?.message || String(e)));
         return;
       }
 

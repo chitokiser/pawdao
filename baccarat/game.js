@@ -465,9 +465,9 @@ btnEnd.addEventListener('click', async ()=>{
     const nonce = qs.get("nonce") || "";
     const ret = getReturnUrl();
 
-    const address = window.ethereum?.selectedAddress;
+    const address = window.ethereum?.selectedAddress || localStorage.getItem('paw_jump_address');
     if(!nonce) throw new Error("nonce 없음: offchain에서 joinGame부터 하세요");
-    if(!address) throw new Error("지갑 주소 없음: Rabby/MetaMask 연결을 확인하세요");
+    if(!address) throw new Error("지갑 주소 없음: offchain 페이지에서 Google 로그인(또는 MetaMask 연결) 후 다시 시도하세요");
 
     const payload = `PAW_OFFCHAIN|${gameId}|${address}|${nonce}|${score}`;
     const sig = await window.ethereum.request({

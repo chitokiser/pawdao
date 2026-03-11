@@ -20,10 +20,10 @@
         <div class="grid">
           <div class="kv"><div class="k">지갑</div><div class="v" id="wAddr">-</div></div>
           <div class="kv"><div class="k">네트워크</div><div class="v" id="wNet">-</div></div>
-          <div class="kv"><div class="k">HEX 잔액</div><div class="v" id="hexBal">-</div></div>
+          <div class="kv"><div class="k">나의 HEX 잔액</div><div class="v" id="hexBal">-</div></div>
 
-          <div class="kv"><div class="k">deposited</div><div class="v" id="uDeposited">-</div></div>
-          <div class="kv"><div class="k">totalPaid</div><div class="v" id="uTotalPaid">-</div></div>
+          <div class="kv"><div class="k">나의기부금액</div><div class="v" id="uDeposited">-</div></div>
+          <div class="kv"><div class="k">누적배당금</div><div class="v" id="uTotalPaid">-</div></div>
           <div class="kv"><div class="k">1회배당금액</div><div class="v" id="uPower">-</div></div>
           <div class="kv"><div class="k">champion</div><div class="v" id="uChampion">-</div></div>
 
@@ -86,7 +86,11 @@
     <div id="pendingModalContent" style="color:#222;font-size:14px;line-height:1.4"></div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.14.0/dist/ethers.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="assets/js/config.js"></script>
+  <script src="assets/js/jump-auth.js"></script>
   <script src="assets/js/wallet.js"></script>
   <script src="assets/js/partials.js"></script>
 

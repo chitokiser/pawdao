@@ -145,12 +145,10 @@
 
       // pendingAt display + modal content
       const uPendingEl = $("uPendingAt");
-      const modalContent = $("pendingModalContent");
       const modal = $("pendingModal");
       const overlay = $("pendingModalOverlay");
       const modalClose = $("pendingModalClose");
       const hintBtn = $("pendingHintBtn");
-      const nowSec = Math.floor(Date.now() / 1000);
       const pa = Number(u.pendingAt) || 0;
       if (uPendingEl) {
         uPendingEl.textContent = pa ? fmtTime(pa) : "Not pending";
@@ -199,6 +197,8 @@
     }
   }
 
+  const toast = (t, m, d) => window.showToast?.(t, m, d);
+
   async function doDeposit() {
     const ctx = await getCtx();
 
@@ -214,21 +214,26 @@
 
     const allowance = await hex.allowance(ctx.address, gameAddr);
     if (allowance < amount) {
+      toast('loading', 'approve — HEX 사용 허가 요청 중...');
       const tx1 = await hex.approve(gameAddr, amount);
       await tx1.wait();
     }
 
+    toast('loading', 'deposit — HEX 기부 트랜잭션 제출 중...');
     const tx2 = await ctx.game.deposit(amount);
     await tx2.wait();
 
+    toast('ok', '기부 완료!', 4000);
     await refresh();
     Wallet.refreshTokenBar?.();
   }
 
   async function doClaim() {
+    toast('loading', 'claim — 배당 인출 요청 중...');
     const ctx = await getCtx();
     const tx = await ctx.game.claim();
     await tx.wait();
+    toast('ok', '배당 인출 완료!', 4000);
     await refresh();
     Wallet.refreshTokenBar?.();
   }
@@ -238,7 +243,7 @@
     $("btnClaim")?.addEventListener("click", () => doClaim().catch(e => alert(e?.message || "실패")));
     // bind generic help buttons
     document.querySelectorAll('.helpBtn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         const key = btn.dataset.help;
         // dynamic data for pending keys
         if (key === 'pending' || key === 'pendingAt') {

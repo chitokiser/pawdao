@@ -124,6 +124,33 @@ body{
 .btn:active{ transform: translateY(1px); opacity:.85; }
 .btn.ghost{ background: rgba(255,255,255,.03); }
 
+/* pending 상태일 때 게임 실행 버튼 활성화 스타일 */
+.btn.btn-open-active{
+  border-color: #39ff14;
+  color: #39ff14;
+  box-shadow: 0 0 8px rgba(57,255,20,.35);
+  animation: pulse-green 1.6s ease-in-out infinite;
+}
+.btn.btn-open-active:hover{ background: rgba(57,255,20,.08); }
+@keyframes pulse-green{
+  0%,100%{ box-shadow: 0 0 6px rgba(57,255,20,.3); }
+  50%    { box-shadow: 0 0 16px rgba(57,255,20,.65); }
+}
+
+/* 비활성화 버튼 */
+.btn.btn-disabled{
+  opacity: .35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.btn.btn-google{
+  border-color: #4285f4;
+  color: #7ab4ff;
+  font-size: 12px;
+  padding: 7px 10px;
+}
+.btn.btn-google:hover{ background: rgba(66,133,244,.12); }
+
 /* =========================
    Desktop nav (≥ 900px)
 ========================= */
@@ -366,7 +393,7 @@ body[data-page="offchain"] .desktop-nav a[href="offchain.html"]{
   padding:10px 12px;
 }
 .kv .k{ font-size:12px; color:var(--muted); }
-.kv .v{ margin-top:6px; font-size:13px; word-break:break-all; }
+.kv .v{ margin-top:6px; font-size:13px; word-break:break-all; color:#39ff14; }
 
 .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
 
@@ -443,3 +470,38 @@ body[data-page="offchain"] .desktop-nav a[href="offchain.html"]{
 
 /* 혹시 남아있을 수 있는 구형 클래스 */
 .desktop-only{ display:none; }
+
+/* =========================
+   Toast 상태 알림
+========================= */
+#statusToast{
+  position: fixed;
+  bottom: 28px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: #1a2340;
+  border: 1px solid var(--line2);
+  box-shadow: 0 4px 24px rgba(0,0,0,.55);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .22s, transform .22s;
+  pointer-events: none;
+  max-width: 320px;
+}
+#statusToast.show{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+#statusToast .toast-icon{ font-size: 15px; flex-shrink: 0; }
+#statusToast.toast-loading{ border-color: rgba(88,140,255,.35); }
+#statusToast.toast-ok    { border-color: rgba(75,227,138,.45); color: #4be38a; }
+#statusToast.toast-err   { border-color: rgba(255,92,92,.40);  color: #ff7a7a; }

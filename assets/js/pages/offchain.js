@@ -149,10 +149,27 @@
       if(uNum) uNum.textContent = String(u.numerator);
       if(uPower) uPower.textContent = fmt18(power) + " HEX/day";
 
-      // 각 카드 joinHint
+      // 각 카드 버튼 상태 업데이트
       for(const gid of Object.keys(GAMES)){
         const g = GAMES[gid];
-        setHint(g.joinHint, u.pendingGame ? "pending" : "대기");
+        setHint(g.joinHint, u.pendingGame ? "pending 중" : "대기");
+
+        const btnJoin = $(g.btnJoin);
+        const btnOpen = $(g.btnOpen);
+
+        // joinGame 버튼: pending 중이면 비활성
+        if(btnJoin){
+          btnJoin.disabled = !!u.pendingGame;
+          btnJoin.classList.toggle('btn-disabled', !!u.pendingGame);
+        }
+
+        // 게임 실행 버튼: pending + 해당 게임 nonce 있을 때 활성(야광녹색)
+        if(btnOpen){
+          const hasNonce = !!localStorage.getItem(LS.nonce(gid));
+          const canOpen  = !!u.pendingGame && hasNonce;
+          btnOpen.classList.toggle('btn-open-active', canOpen);
+          btnOpen.classList.toggle('btn-disabled',    !canOpen);
+        }
       }
     }catch(_e){
       // 연결 전: 조용히
